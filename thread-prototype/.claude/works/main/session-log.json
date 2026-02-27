@@ -1,0 +1,238 @@
+{
+  "session": {
+    "id": "wf-spec-plan-run-2026-02-28",
+    "date": "2026-02-28",
+    "project": "Flow×Stock PKM App — Phase 1 Prototype",
+    "phases_executed": ["spec", "plan", "run (pending)"],
+    "working_directory": "/Users/ta21cos/ghq/github.com/ta21cos/playground/thread-prototype"
+  },
+  "spec_phase": {
+    "input": {
+      "type": "user-provided-spec",
+      "source": "設計議論 (2026-02-26) からの仕様書",
+      "original_tech_stack": {
+        "frontend": "Next.js + React",
+        "backend": "NestJS",
+        "db": "SQLite → PostgreSQL",
+        "realtime": "Socket.io",
+        "search": "Meilisearch",
+        "hosting": "クラウド"
+      }
+    },
+    "exploration": {
+      "codebase_status": "greenfield (empty project)",
+      "tech_stack_research": {
+        "agent": "general-purpose (sonnet)",
+        "key_findings": [
+          {
+            "topic": "NestJS necessity",
+            "verdict": "不要 — Next.js Server Actions で十分",
+            "reason": "単一ユーザーアプリにバックエンド分離は不要"
+          },
+          {
+            "topic": "Socket.io necessity",
+            "verdict": "不要 — SSE or ポーリングで十分",
+            "reason": "双方向通信不要、単一ユーザー"
+          },
+          {
+            "topic": "Meilisearch necessity",
+            "verdict": "初期不要 — PostgreSQL FTS で十分",
+            "reason": "数千件規模ではオーバーキル"
+          },
+          {
+            "topic": "DB choice",
+            "verdict": "Neon PostgreSQL 推奨 (クラウド前提の場合)",
+            "reason": "サーバーレス、無料枠、FTS内蔵"
+          },
+          {
+            "topic": "recommended_stack",
+            "verdict": "Next.js 15 + Drizzle + Neon PostgreSQL + SSE + PG FTS"
+          }
+        ]
+      }
+    },
+    "user_decisions": [
+      {
+        "question": "認証方式",
+        "answer": "なし (prototype)",
+        "reason": "プロトタイプなので不要"
+      },
+      {
+        "question": "画像ストレージ",
+        "answer": "Phase 1 では画像対応しない",
+        "reason": "テキストのみでMVPをシンプルに"
+      },
+      {
+        "question": "デプロイ構成",
+        "answer": "ローカルで動けば OK",
+        "reason": "プロトタイプ段階"
+      },
+      {
+        "question": "リアルタイム更新",
+        "answer": "リロードで十分",
+        "reason": "プロトタイプ段階"
+      }
+    ],
+    "additional_user_constraints": [
+      "プロトタイプとして作成する",
+      "ユーザは一人想定",
+      "local の sqlite にデータを保存",
+      "web app として作成する、next.js の server actions を使い、backend は使わず書く",
+      "ask することなく自律的に plan, run を実行"
+    ],
+    "final_tech_stack": {
+      "framework": "Next.js 15 (App Router)",
+      "orm": "Drizzle ORM",
+      "db": "SQLite (better-sqlite3, local file)",
+      "search": "SQLite FTS5 (trigram tokenizer)",
+      "realtime": "なし (リロードで更新)",
+      "ui": "Tailwind CSS + shadcn/ui",
+      "markdown": "react-markdown + remark-gfm",
+      "deploy": "ローカルのみ",
+      "auth": "なし",
+      "image": "なし (Phase 1 スコープ外)"
+    },
+    "requirements_summary": {
+      "functional_requirements": 16,
+      "non_functional_requirements": 3,
+      "fr_breakdown": {
+        "channel_management": ["FR-1: チャンネル作成", "FR-2: 一覧表示", "FR-3: 削除", "FR-4: 編集"],
+        "messages": ["FR-5: テキスト投稿", "FR-6: Markdown表示", "FR-7: 時系列表示", "FR-8: 編集・削除"],
+        "threads": ["FR-9: スレッド返信", "FR-10: サイドパネル表示"],
+        "reactions": ["FR-11: 絵文字リアクション", "FR-12: :記法サジェスト"],
+        "search": ["FR-13: Cmd+K モーダル", "FR-14: 全文検索 (FTS5)", "FR-15: 結果ジャンプ"],
+        "calendar": ["FR-16: カレンダービュー"]
+      }
+    }
+  },
+  "plan_phase": {
+    "pr_chain": {
+      "total": 4,
+      "dependency": "PR1 → PR2 → PR3 → PR4 (linear)",
+      "prs": [
+        {
+          "id": 1,
+          "title": "Foundation — プロジェクトセットアップ + チャンネル管理",
+          "branch": "feat/foundation-channels",
+          "base": "main",
+          "pattern": "Foundation First",
+          "scope": ["FR-1", "FR-2", "FR-3", "FR-4", "NFR-1", "NFR-2"],
+          "schema_tables": ["channels"],
+          "estimated_files": 12
+        },
+        {
+          "id": 2,
+          "title": "Messages — メッセージ投稿 + Markdown + タイムライン",
+          "branch": "feat/messages",
+          "base": "feat/foundation-channels",
+          "pattern": "Layer by Layer",
+          "scope": ["FR-5", "FR-6", "FR-7", "FR-8", "NFR-3"],
+          "schema_tables": ["messages"],
+          "estimated_files": 7
+        },
+        {
+          "id": 3,
+          "title": "Threads + Reactions — スレッド返信 + 絵文字リアクション",
+          "branch": "feat/threads-reactions",
+          "base": "feat/messages",
+          "pattern": "Vertical Slice",
+          "scope": ["FR-9", "FR-10", "FR-11", "FR-12"],
+          "schema_tables": ["thread_messages", "reactions"],
+          "estimated_files": 8
+        },
+        {
+          "id": 4,
+          "title": "Search + Calendar — 全文検索 + カレンダービュー",
+          "branch": "feat/search-calendar",
+          "base": "feat/threads-reactions",
+          "pattern": "Vertical Slice",
+          "scope": ["FR-13", "FR-14", "FR-15", "FR-16"],
+          "schema_tables": ["messages_fts (FTS5 virtual table)"],
+          "estimated_files": 7
+        }
+      ]
+    },
+    "critique": {
+      "agents": ["MECE/Coverage (Agent A)", "Risk/PR Split (Agent B)", "Feasibility (Agent C)"],
+      "high_severity_findings": [
+        {
+          "source": "Agent A",
+          "issue": "NFR-1 (レスポンシブ) が未割当",
+          "resolution": "PR1 でレスポンシブ対応サイドバーレイアウト実装"
+        },
+        {
+          "source": "Agent A",
+          "issue": "チャンネル削除のカスケード未定義",
+          "resolution": "CASCADE DELETE を明記"
+        },
+        {
+          "source": "Agent A",
+          "issue": "FTS5 を PR4 まで遅延すると既存データのバックフィル問題",
+          "resolution": "PR4 で FTS リビルドコマンドを実行"
+        },
+        {
+          "source": "Agent B",
+          "issue": "better-sqlite3 + Next.js HMR クラッシュリスク",
+          "resolution": "globalThis singleton + serverExternalPackages 設定"
+        },
+        {
+          "source": "Agent B",
+          "issue": "PR1 スコープ過大 (>10 files)",
+          "resolution": "スキーマをインクリメンタルに追加する方式に変更"
+        },
+        {
+          "source": "Agent C",
+          "issue": "better-sqlite3 は native module、next.config.ts 設定必須",
+          "resolution": "serverExternalPackages: ['better-sqlite3']"
+        },
+        {
+          "source": "Agent C",
+          "issue": "Drizzle ORM は FTS5 非対応",
+          "resolution": "FTS5 は raw SQL で管理、通常テーブルのみ Drizzle"
+        }
+      ],
+      "medium_severity_findings": [
+        {
+          "source": "Agent A",
+          "issue": "スレッド返信の編集・削除が未定義",
+          "resolution": "PR3 に追加"
+        },
+        {
+          "source": "Agent A",
+          "issue": "空状態・エラー状態の表示が未定義",
+          "resolution": "各 PR で empty state を実装"
+        },
+        {
+          "source": "Agent B",
+          "issue": "FTS5 日本語トークナイズが弱い",
+          "resolution": "trigram tokenizer を使用"
+        },
+        {
+          "source": "Agent C",
+          "issue": "emoji-mart 等は SSR 問題あり",
+          "resolution": "カスタム実装 (静的絵文字マップ)"
+        },
+        {
+          "source": "Agent C",
+          "issue": "カレンダーは FullCalendar 等不要",
+          "resolution": "42 セルグリッドのカスタム実装"
+        }
+      ],
+      "key_technical_decisions": [
+        "FTS5 は Drizzle 非対応 → raw SQL + DB初期化時に CREATE VIRTUAL TABLE",
+        "SQLite FTS5 に trigram tokenizer 使用 → 日本語の分かち書き不要",
+        "絵文字ピッカーはライブラリ不使用 → curated ~100 emoji の静的マップ",
+        "カレンダーはライブラリ不使用 → カスタム 42 セルグリッド",
+        "スレッドパネルの状態は URL search params で管理",
+        "rehype-raw は使わない (XSS 防止)",
+        "テストは Phase 1 では書かない (明示的判断)"
+      ]
+    }
+  },
+  "artifacts": {
+    "requirements": ".claude/works/main/REQUIREMENTS.md",
+    "plan": ".claude/works/main/PLAN.md",
+    "phase_state": ".claude/works/main/PHASE.md",
+    "session_log": ".claude/works/main/session-log.json"
+  }
+}
