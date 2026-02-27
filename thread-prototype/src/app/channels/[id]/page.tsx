@@ -8,13 +8,17 @@ import { getReactionsForMessages } from "@/app/actions/reactions";
 import { MessageList } from "@/components/message-list";
 import { MessageInput } from "@/components/message-input";
 import { ThreadPanel } from "@/components/thread-panel";
+import { CalendarView } from "@/components/calendar-view";
 
 export default async function ChannelPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ highlight?: string }>;
 }) {
   const { id } = await params;
+  const { highlight } = await searchParams;
   const channelId = Number(id);
   const channel = await getChannel(channelId);
 
@@ -43,10 +47,12 @@ export default async function ChannelPage({
             </p>
           )}
         </div>
+        <CalendarView channelId={channelId} />
         <MessageList
           messages={messages}
           threadReplyCounts={threadReplyCounts}
           reactionsByMessage={reactionsByMessage}
+          highlightMessageId={highlight}
         />
         <MessageInput channelId={channelId} />
       </div>

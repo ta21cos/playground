@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Pencil,
@@ -32,12 +32,26 @@ export function MessageItem({
   message,
   threadReplyCount,
   reactions,
+  highlight,
 }: {
   message: Message;
   threadReplyCount?: number;
   reactions?: { id: string; emoji: string }[];
+  highlight?: boolean;
 }) {
+  const highlightRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (highlight && highlightRef.current) {
+      const el = highlightRef.current;
+      el.classList.add("bg-yellow-100", "dark:bg-yellow-900/30");
+      const timer = setTimeout(() => {
+        el.classList.remove("bg-yellow-100", "dark:bg-yellow-900/30");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [highlight]);
   const [editContent, setEditContent] = useState(message.content);
   const [deleting, setDeleting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -88,7 +102,11 @@ export function MessageItem({
   };
 
   return (
-    <div className="group relative rounded-md px-3 py-2 hover:bg-muted/50">
+    <div
+      ref={highlightRef}
+      id={`msg-${message.id}`}
+      className="group relative rounded-md px-3 py-2 transition-colors duration-1000 hover:bg-muted/50"
+    >
       <div className="flex items-baseline gap-2">
         <span className="text-xs text-muted-foreground">
           {formatTimestamp(message.createdAt)}

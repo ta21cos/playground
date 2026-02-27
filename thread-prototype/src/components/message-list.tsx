@@ -9,16 +9,25 @@ export function MessageList({
   messages,
   threadReplyCounts,
   reactionsByMessage,
+  highlightMessageId,
 }: {
   messages: Message[];
   threadReplyCounts?: Record<string, number>;
   reactionsByMessage?: Record<string, { id: string; emoji: string }[]>;
+  highlightMessageId?: string;
 }) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (highlightMessageId) {
+      const el = document.getElementById(`msg-${highlightMessageId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+    }
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+  }, [messages.length, highlightMessageId]);
 
   if (messages.length === 0) {
     return (
@@ -38,6 +47,7 @@ export function MessageList({
             message={message}
             threadReplyCount={threadReplyCounts?.[message.id]}
             reactions={reactionsByMessage?.[message.id]}
+            highlight={message.id === highlightMessageId}
           />
         ))}
         <div ref={bottomRef} />
