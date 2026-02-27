@@ -1,6 +1,9 @@
 import { Hash } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getChannel } from "@/app/actions/channels";
+import { getMessages } from "@/app/actions/messages";
+import { MessageList } from "@/components/message-list";
+import { MessageInput } from "@/components/message-input";
 
 export default async function ChannelPage({
   params,
@@ -8,11 +11,14 @@ export default async function ChannelPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const channel = await getChannel(Number(id));
+  const channelId = Number(id);
+  const channel = await getChannel(channelId);
 
   if (!channel) {
     notFound();
   }
+
+  const messages = await getMessages(channelId);
 
   return (
     <div className="flex h-full flex-col">
@@ -27,11 +33,8 @@ export default async function ChannelPage({
           </p>
         )}
       </div>
-      <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          Messages will appear here in a future update.
-        </p>
-      </div>
+      <MessageList messages={messages} />
+      <MessageInput channelId={channelId} />
     </div>
   );
 }
