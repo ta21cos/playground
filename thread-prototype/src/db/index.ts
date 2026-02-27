@@ -37,6 +37,26 @@ function createDatabase() {
     );
   `);
 
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS thread_messages (
+      id TEXT PRIMARY KEY,
+      message_id TEXT NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS reactions (
+      id TEXT PRIMARY KEY,
+      message_id TEXT NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+      emoji TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(message_id, emoji)
+    );
+  `);
+
   return drizzle(sqlite, { schema });
 }
 

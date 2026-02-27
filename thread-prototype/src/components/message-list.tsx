@@ -5,7 +5,15 @@ import { MessageItem } from "@/components/message-item";
 import { MessageCircle } from "lucide-react";
 import type { Message } from "@/db/schema";
 
-export function MessageList({ messages }: { messages: Message[] }) {
+export function MessageList({
+  messages,
+  threadReplyCounts,
+  reactionsByMessage,
+}: {
+  messages: Message[];
+  threadReplyCounts?: Record<string, number>;
+  reactionsByMessage?: Record<string, { id: string; emoji: string }[]>;
+}) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,7 +33,12 @@ export function MessageList({ messages }: { messages: Message[] }) {
     <div className="flex flex-1 flex-col overflow-y-auto">
       <div className="mt-auto flex flex-col gap-1 py-4">
         {messages.map((message) => (
-          <MessageItem key={message.id} message={message} />
+          <MessageItem
+            key={message.id}
+            message={message}
+            threadReplyCount={threadReplyCounts?.[message.id]}
+            reactions={reactionsByMessage?.[message.id]}
+          />
         ))}
         <div ref={bottomRef} />
       </div>

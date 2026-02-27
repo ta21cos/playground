@@ -1,11 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, Check, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Pencil,
+  Trash2,
+  Check,
+  X,
+  MessageSquare,
+  SmilePlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
+import { EmojiPicker } from "@/components/emoji-picker";
 import { updateMessage, deleteMessage } from "@/app/actions/messages";
+import { toggleReaction } from "@/app/actions/reactions";
 import type { Message } from "@/db/schema";
 
 function formatTimestamp(isoString: string) {
@@ -18,10 +28,21 @@ function formatTimestamp(isoString: string) {
   });
 }
 
-export function MessageItem({ message }: { message: Message }) {
+export function MessageItem({
+  message,
+  threadReplyCount,
+  reactions,
+}: {
+  message: Message;
+  threadReplyCount?: number;
+  reactions?: { id: string; emoji: string }[];
+}) {
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(message.content);
   const [deleting, setDeleting] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const isEdited = message.createdAt !== message.updatedAt;
 
@@ -49,6 +70,21 @@ export function MessageItem({ message }: { message: Message }) {
     if (e.key === "Escape") {
       handleCancelEdit();
     }
+  };
+
+  const handleOpenThread = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("thread", message.id);
+    router.push(`?${params.toString()}`);
+  };
+
+  const handleReactionSelect = async (emoji: string) => {
+    setShowEmojiPicker(false);
+    await toggleReaction(message.id, emoji, message.channelId);
+  };
+
+  const handleReactionClick = async (emoji: string) => {
+    await toggleReaction(message.id, emoji, message.channelId);
   };
 
   return (
@@ -88,8 +124,59 @@ export function MessageItem({ message }: { message: Message }) {
         </div>
       )}
 
+      {reactions && reactions.length > 0 && !editing && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {reactions.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => handleReactionClick(r.emoji)}
+              className="inline-flex items-center rounded-full border px-2 py-0.5 text-sm transition-colors hover:bg-muted"
+            >
+              {r.emoji}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {threadReplyCount !== undefined && threadReplyCount > 0 && !editing && (
+        <button
+          onClick={handleOpenThread}
+          className="mt-1 text-xs font-medium text-primary hover:underline"
+        >
+          {threadReplyCount} {threadReplyCount === 1 ? "reply" : "replies"}
+        </button>
+      )}
+
       {!editing && (
         <div className="absolute -top-2 right-2 hidden gap-0.5 rounded-md border bg-background p-0.5 shadow-sm group-hover:flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={handleOpenThread}
+            title="Reply in thread"
+          >
+            <MessageSquare className="h-3 w-3" />
+          </Button>
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              title="Add reaction"
+            >
+              <SmilePlus className="h-3 w-3" />
+            </Button>
+            {showEmojiPicker && (
+              <div className="absolute right-0 top-full z-50 mt-1">
+                <EmojiPicker
+                  onSelect={handleReactionSelect}
+                  onClose={() => setShowEmojiPicker(false)}
+                />
+              </div>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="icon"
