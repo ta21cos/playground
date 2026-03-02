@@ -9,6 +9,7 @@ import {
   X,
   MessageSquare,
   SmilePlus,
+  Pin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,11 +34,19 @@ export function MessageItem({
   threadReplyCount,
   reactions,
   highlight,
+  selectionMode,
+  selected,
+  onToggleSelect,
+  onPromote,
 }: {
   message: Message;
   threadReplyCount?: number;
   reactions?: { id: string; emoji: string }[];
   highlight?: boolean;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
+  onPromote?: (messageId: string) => void;
 }) {
   const highlightRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
@@ -105,14 +114,30 @@ export function MessageItem({
     <div
       ref={highlightRef}
       id={`msg-${message.id}`}
-      className="group relative rounded-md px-3 py-2 transition-colors duration-1000 hover:bg-muted/50"
+      className={`group relative rounded-md px-3 py-2 transition-colors duration-1000 hover:bg-muted/50 ${
+        selected ? "bg-primary/5 ring-1 ring-primary/20" : ""
+      }`}
     >
       <div className="flex items-baseline gap-2">
+        {selectionMode && (
+          <input
+            type="checkbox"
+            checked={selected ?? false}
+            onChange={() => onToggleSelect?.(message.id)}
+            className="mt-0.5 shrink-0 rounded"
+          />
+        )}
         <span className="text-xs text-muted-foreground">
           {formatTimestamp(message.createdAt)}
         </span>
         {isEdited && (
           <span className="text-xs italic text-muted-foreground">(edited)</span>
+        )}
+        {message.isPromoted === 1 && (
+          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+            <Pin className="h-2.5 w-2.5" />
+            promoted
+          </span>
         )}
       </div>
 
@@ -195,6 +220,17 @@ export function MessageItem({
               </div>
             )}
           </div>
+          {!message.isPromoted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => onPromote?.(message.id)}
+              title="Promote to inbox"
+            >
+              <Pin className="h-3 w-3" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
