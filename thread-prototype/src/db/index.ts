@@ -123,6 +123,37 @@ function initDatabase(): {
       INSERT INTO messages_fts(content, message_id, channel_id)
       SELECT content, id, channel_id FROM messages;
     `);
+
+    sqlite.exec(`
+      CREATE VIRTUAL TABLE IF NOT EXISTS stocks_fts USING fts5(
+        title,
+        content,
+        stock_id UNINDEXED,
+        status UNINDEXED,
+        tokenize='trigram'
+      );
+
+      CREATE TRIGGER IF NOT EXISTS stocks_ai AFTER INSERT ON stocks BEGIN
+        INSERT INTO stocks_fts(title, content, stock_id, status)
+        VALUES (new.title, new.content, new.id, new.status);
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS stocks_au AFTER UPDATE ON stocks BEGIN
+        DELETE FROM stocks_fts WHERE stock_id = old.id;
+        INSERT INTO stocks_fts(title, content, stock_id, status)
+        VALUES (new.title, new.content, new.id, new.status);
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS stocks_ad AFTER DELETE ON stocks BEGIN
+        DELETE FROM stocks_fts WHERE stock_id = old.id;
+      END;
+    `);
+
+    sqlite.exec(`
+      DELETE FROM stocks_fts;
+      INSERT INTO stocks_fts(title, content, stock_id, status)
+      SELECT title, content, id, status FROM stocks;
+    `);
   } catch {
     // FTS setup may conflict with concurrent workers; non-fatal for startup
   }
