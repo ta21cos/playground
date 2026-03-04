@@ -115,8 +115,7 @@ function ThreadReplyItem({
         <div className="absolute -top-2 right-2 hidden gap-0.5 rounded-md border bg-background p-0.5 shadow-sm group-hover:flex">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-6 w-6"
+            size="icon-xs"
             onClick={() => {
               setEditContent(reply.content);
               setEditing(true);
@@ -126,8 +125,8 @@ function ThreadReplyItem({
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-destructive hover:text-destructive"
+            size="icon-xs"
+            className="text-destructive hover:text-destructive"
             onClick={handleDelete}
             disabled={deleting}
           >
@@ -297,8 +296,7 @@ function ThreadPanelContent({
         </div>
         <Button
           variant="ghost"
-          size="icon"
-          className="h-6 w-6"
+          size="icon-xs"
           onClick={onClose}
         >
           <X className="h-4 w-4" />

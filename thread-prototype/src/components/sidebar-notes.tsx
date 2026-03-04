@@ -76,7 +76,7 @@ function SidebarGroup({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-accent"
+        className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent"
       >
         {open ? (
           <ChevronDown className="h-3 w-3" />
@@ -117,7 +117,7 @@ function NoteLink({
       href={`/notes/${note.id}`}
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
+        "flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent",
         isActive && "bg-accent font-medium",
       )}
     >

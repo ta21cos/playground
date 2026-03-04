@@ -27,8 +27,7 @@ export function ChannelActions({ channel }: { channel: Channel }) {
       <div className="relative">
         <Button
           variant="ghost"
-          size="icon"
-          className="h-6 w-6"
+          size="icon-xs"
           onClick={(e) => {
             e.preventDefault();
             setShowMenu((prev) => !prev);

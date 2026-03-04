@@ -134,7 +134,7 @@ export function CalendarView({ channelId }: { channelId: number }) {
             {DAYS_OF_WEEK.map((d) => (
               <div
                 key={d}
-                className="pb-1 text-center text-[10px] text-muted-foreground"
+                className="pb-1 text-center text-xs text-muted-foreground"
               >
                 {d}
               </div>

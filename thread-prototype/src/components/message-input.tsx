@@ -93,6 +93,8 @@ export function MessageInput({ channelId }: { channelId: number }) {
           onClick={handleSubmit}
           disabled={!content.trim() || sending}
           className="shrink-0 self-end"
+          aria-label="Send message"
+          title="Send message"
         >
           <Send className="h-4 w-4" />
         </Button>

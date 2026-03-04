@@ -253,7 +253,7 @@ export function SearchModal() {
                         </span>
                         <span>·</span>
                         <span
-                          className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+                          className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-medium ${
                             result.status === "note"
                               ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                               : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
@@ -333,7 +333,7 @@ export function SearchModal() {
                   </span>
                   <span>·</span>
                   <span
-                    className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+                    className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-medium ${
                       result.status === "note"
                         ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                         : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"

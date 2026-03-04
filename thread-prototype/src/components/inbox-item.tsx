@@ -87,11 +87,12 @@ export function InboxItem({
 
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
+          size="icon-sm"
+          className="shrink-0 text-destructive hover:text-destructive"
           onClick={handleDelete}
           disabled={isPending}
-          title="Delete"
+          aria-label="Delete inbox item"
+          title="Delete inbox item"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

@@ -53,7 +53,7 @@ export function MobileSidebar({
           <Link
             href="/inbox"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent"
+            className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-muted-foreground hover:bg-accent"
           >
             <Inbox className="h-4 w-4" />
             Inbox
@@ -81,7 +81,7 @@ export function MobileSidebar({
           <Link
             href="/notes"
             onClick={() => setOpen(false)}
-            className="mb-1 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent"
+            className="mb-1 flex items-center gap-2 rounded-md px-2 py-2 text-sm text-muted-foreground hover:bg-accent"
           >
             All Notes
           </Link>

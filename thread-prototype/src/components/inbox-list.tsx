@@ -77,9 +77,8 @@ export function InboxList({
         </span>
         <Button
           variant={selectionMode ? "secondary" : "ghost"}
-          size="sm"
+          size="xs"
           onClick={handleToggleSelectionMode}
-          className="h-7 gap-1 text-xs"
         >
           <CheckSquare className="h-3 w-3" />
           {selectionMode ? "Cancel" : "Select"}
@@ -99,9 +98,10 @@ export function InboxList({
               <div className="absolute right-12 top-4">
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1 text-xs"
+                  size="xs"
                   onClick={() => handleMoveToNote([item.id])}
+                  aria-label="Move to note"
+                  title="Move to note"
                 >
                   <FileOutput className="h-3 w-3" />
                   To Note

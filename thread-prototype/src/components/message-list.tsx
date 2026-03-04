@@ -108,16 +108,15 @@ export function MessageList({
       <div className="sticky top-0 z-10 flex items-center justify-end border-b bg-background/80 px-3 py-1 backdrop-blur-sm">
         <Button
           variant={selectionMode ? "secondary" : "ghost"}
-          size="sm"
+          size="xs"
           onClick={handleToggleSelectionMode}
-          className="h-7 gap-1 text-xs"
         >
           <CheckSquare className="h-3 w-3" />
           {selectionMode ? "Cancel Selection" : "Select"}
         </Button>
       </div>
 
-      <div className="mt-auto flex flex-col gap-1 py-4">
+      <div className="flex flex-col gap-1 py-4">
         {messages.map((message) => (
           <MessageItem
             key={message.id}

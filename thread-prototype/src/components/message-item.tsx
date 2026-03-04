@@ -134,7 +134,7 @@ export function MessageItem({
           <span className="text-xs italic text-muted-foreground">(edited)</span>
         )}
         {message.isPromoted === 1 && (
-          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+          <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
             <Pin className="h-2.5 w-2.5" />
             promoted
           </span>
@@ -194,9 +194,9 @@ export function MessageItem({
         <div className="absolute -top-2 right-2 hidden gap-0.5 rounded-md border bg-background p-0.5 shadow-sm group-hover:flex">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-6 w-6"
+            size="icon-xs"
             onClick={handleOpenThread}
+            aria-label="Reply in thread"
             title="Reply in thread"
           >
             <MessageSquare className="h-3 w-3" />
@@ -204,9 +204,9 @@ export function MessageItem({
           <div className="relative">
             <Button
               variant="ghost"
-              size="icon"
-              className="h-6 w-6"
+              size="icon-xs"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              aria-label="Add reaction"
               title="Add reaction"
             >
               <SmilePlus className="h-3 w-3" />
@@ -223,9 +223,9 @@ export function MessageItem({
           {!message.isPromoted && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-6 w-6"
+              size="icon-xs"
               onClick={() => onPromote?.(message.id)}
+              aria-label="Promote to inbox"
               title="Promote to inbox"
             >
               <Pin className="h-3 w-3" />
@@ -233,21 +233,24 @@ export function MessageItem({
           )}
           <Button
             variant="ghost"
-            size="icon"
-            className="h-6 w-6"
+            size="icon-xs"
             onClick={() => {
               setEditContent(message.content);
               setEditing(true);
             }}
+            aria-label="Edit message"
+            title="Edit message"
           >
             <Pencil className="h-3 w-3" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-destructive hover:text-destructive"
+            size="icon-xs"
+            className="text-destructive hover:text-destructive"
             onClick={handleDelete}
             disabled={deleting}
+            aria-label="Delete message"
+            title="Delete message"
           >
             <Trash2 className="h-3 w-3" />
           </Button>

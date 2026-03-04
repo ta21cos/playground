@@ -89,12 +89,15 @@ export function NoteEditor({
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="title" className="sr-only">
+            Title
+          </Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Note title"
+            className="text-2xl font-bold border-0 shadow-none px-0 focus-visible:ring-0"
           />
         </div>
 
@@ -105,7 +108,7 @@ export function NoteEditor({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write your note in Markdown..."
-            className="min-h-[300px] font-mono"
+            className="min-h-[50vh] font-mono"
           />
         </div>
 
