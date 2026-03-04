@@ -111,20 +111,20 @@ export function CalendarView({ channelId }: { channelId: number }) {
           <div className="mb-2 flex items-center justify-between">
             <Button
               variant="ghost"
-              size="icon"
-              className="h-6 w-6"
+              size="icon-xs"
               onClick={goToPrevMonth}
               disabled={isPending}
+              aria-label="Previous month"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
             <span className="text-xs font-medium">{monthName}</span>
             <Button
               variant="ghost"
-              size="icon"
-              className="h-6 w-6"
+              size="icon-xs"
               onClick={goToNextMonth}
               disabled={isPending}
+              aria-label="Next month"
             >
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>
@@ -150,7 +150,7 @@ export function CalendarView({ channelId }: { channelId: number }) {
                   {cell.day !== null ? (
                     <>
                       <span
-                        className={`text-[11px] leading-tight ${
+                        className={`text-xs leading-tight ${
                           isToday
                             ? "font-bold text-primary"
                             : "text-muted-foreground"
@@ -163,7 +163,7 @@ export function CalendarView({ channelId }: { channelId: number }) {
                       )}
                     </>
                   ) : (
-                    <span className="text-[11px] leading-tight">&nbsp;</span>
+                    <span className="text-xs leading-tight">&nbsp;</span>
                   )}
                 </div>
               );

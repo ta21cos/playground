@@ -120,6 +120,8 @@ function ThreadReplyItem({
               setEditContent(reply.content);
               setEditing(true);
             }}
+            aria-label="Edit reply"
+            title="Edit reply"
           >
             <Pencil className="h-3 w-3" />
           </Button>
@@ -129,6 +131,8 @@ function ThreadReplyItem({
             className="text-destructive hover:text-destructive"
             onClick={handleDelete}
             disabled={deleting}
+            aria-label="Delete reply"
+            title="Delete reply"
           >
             <Trash2 className="h-3 w-3" />
           </Button>
@@ -227,6 +231,8 @@ function ThreadReplyInput({
           onClick={handleSubmit}
           disabled={!content.trim() || sending}
           className="shrink-0 self-end"
+          aria-label="Send reply"
+          title="Send reply"
         >
           <Send className="h-4 w-4" />
         </Button>
@@ -298,6 +304,8 @@ function ThreadPanelContent({
           variant="ghost"
           size="icon-xs"
           onClick={onClose}
+          aria-label="Close thread"
+          title="Close thread"
         >
           <X className="h-4 w-4" />
         </Button>
