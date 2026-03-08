@@ -6,6 +6,7 @@ import Dexie from "dexie";
 import { db } from "@/lib/db";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
+import { DeckMergeDialog } from "@/components/deck-merge-dialog";
 
 export default function HomePage() {
   const decks = useLiveQuery(() => db.decks.toArray());
@@ -32,7 +33,10 @@ export default function HomePage() {
 
   return (
     <div className="px-4 pt-6">
-      <h1 className="mb-4 text-2xl font-bold">デッキ</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">デッキ</h1>
+        {decks.length >= 2 && <DeckMergeDialog />}
+      </div>
       <div className="space-y-3">
         {decks.map((deck) => (
           <DeckItem key={deck.id} deck={deck} />
