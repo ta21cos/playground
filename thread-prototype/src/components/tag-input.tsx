@@ -1,15 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { X } from "lucide-react";
-import {
-  Command,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-} from "@/components/ui/command";
+import { useState, useRef } from "react";
+import { X, Hash, Plus } from "lucide-react";
 
 interface TagInputProps {
   tags: string[];
@@ -20,6 +12,8 @@ interface TagInputProps {
 export function TagInput({ tags, onChange, suggestions }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const filteredSuggestions = suggestions.filter(
     (s) =>
       s.toLowerCase().includes(inputValue.toLowerCase()) &&
@@ -47,72 +41,90 @@ export function TagInput({ tags, onChange, suggestions }: TagInputProps) {
     if (e.key === "Backspace" && !inputValue && tags.length > 0) {
       removeTag(tags[tags.length - 1]);
     }
+    if (e.key === "Escape") {
+      setOpen(false);
+      inputRef.current?.blur();
+    }
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-1.5">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-sm"
+    <div className="relative flex flex-wrap items-center gap-1.5">
+      {tags.map((tag) => (
+        <span
+          key={tag}
+          className="group inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+        >
+          <Hash className="h-3 w-3 opacity-50" />
+          {tag}
+          <button
+            type="button"
+            onClick={() => removeTag(tag)}
+            className="ml-0.5 rounded-full opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
           >
-            {tag}
-            <button
-              type="button"
-              onClick={() => removeTag(tag)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </span>
-        ))}
-      </div>
+            <X className="h-3 w-3" />
+          </button>
+        </span>
+      ))}
+
       <div className="relative">
-        <Command className="border rounded-md" shouldFilter={false}>
-          <CommandInput
+        {open ? (
+          <input
+            ref={inputRef}
             value={inputValue}
-            onValueChange={(val) => {
-              setInputValue(val);
-              setOpen(true);
+            onChange={(e) => {
+              setInputValue(e.target.value);
             }}
             onKeyDown={handleKeyDown}
-            onFocus={() => setOpen(true)}
-            onBlur={() => setTimeout(() => setOpen(false), 200)}
+            onBlur={() => setTimeout(() => setOpen(false), 150)}
+            autoFocus
             placeholder="Add tag..."
+            className="h-6 w-24 bg-transparent text-xs outline-none placeholder:text-muted-foreground/50"
           />
-          {open && (inputValue || filteredSuggestions.length > 0) && (
-            <CommandList>
-              <CommandEmpty>
-                {inputValue.trim() && (
-                  <button
-                    type="button"
-                    className="w-full text-left px-2 py-1.5 text-sm hover:bg-accent rounded"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      addTag(inputValue);
-                    }}
-                  >
-                    Create &quot;{inputValue.trim().toLowerCase()}&quot;
-                  </button>
-                )}
-              </CommandEmpty>
-              {filteredSuggestions.length > 0 && (
-                <CommandGroup>
-                  {filteredSuggestions.map((suggestion) => (
-                    <CommandItem
-                      key={suggestion}
-                      value={suggestion}
-                      onSelect={() => addTag(suggestion)}
-                    >
-                      {suggestion}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              )}
-            </CommandList>
-          )}
-        </Command>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(true);
+            }}
+            className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/30 px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:border-muted-foreground/60 hover:text-foreground"
+          >
+            <Plus className="h-3 w-3" />
+            Tag
+          </button>
+        )}
+
+        {open && (inputValue || filteredSuggestions.length > 0) && (
+          <div className="absolute left-0 top-full z-50 mt-1 min-w-[160px] overflow-hidden rounded-lg border bg-popover p-1 shadow-lg">
+            {filteredSuggestions.length > 0 ? (
+              filteredSuggestions.slice(0, 8).map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    addTag(suggestion);
+                  }}
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-accent"
+                >
+                  <Hash className="h-3 w-3 text-muted-foreground" />
+                  {suggestion}
+                </button>
+              ))
+            ) : inputValue.trim() ? (
+              <button
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  addTag(inputValue);
+                }}
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-accent"
+              >
+                <Plus className="h-3 w-3 text-muted-foreground" />
+                Create &quot;{inputValue.trim().toLowerCase()}&quot;
+              </button>
+            ) : null}
+          </div>
+        )}
       </div>
     </div>
   );
