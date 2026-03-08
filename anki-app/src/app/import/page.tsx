@@ -87,7 +87,7 @@ export default function ImportPage() {
               ファイルをドラッグ＆ドロップ
             </p>
             <p className="mb-3 text-xs text-muted-foreground">
-              .txt / .csv / .apkg に対応
+              .txt / .tsv / .csv / .apkg に対応
             </p>
           </>
         )}
@@ -101,7 +101,7 @@ export default function ImportPage() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".txt,.csv,.apkg"
+          accept=".txt,.tsv,.csv,.apkg"
           className="hidden"
           onClick={(e) => {
             (e.target as HTMLInputElement).value = "";

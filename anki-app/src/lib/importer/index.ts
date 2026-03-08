@@ -20,6 +20,7 @@ export async function importFile(
 
   switch (ext) {
     case "txt":
+    case "tsv":
       parsedCards = parseTxt(await file.text());
       break;
     case "csv":
@@ -30,7 +31,7 @@ export async function importFile(
       break;
     default:
       throw new Error(
-        `未対応のファイル形式です: .${ext}（.txt, .csv, .apkg に対応）`,
+        `未対応のファイル形式です: .${ext}（.txt, .tsv, .csv, .apkg に対応）`,
       );
   }
 
