@@ -1,6 +1,7 @@
 import { getChannels } from "@/app/actions/channels";
 import { getNotes, getInboxCount } from "@/app/actions/stocks";
 import { MobileSidebar } from "./mobile-sidebar";
+import { ThemeToggle } from "./theme-toggle";
 
 export async function MobileHeader() {
   const [channelList, notes, inboxCount] = await Promise.all([
@@ -16,7 +17,8 @@ export async function MobileHeader() {
         notes={notes}
         inboxCount={inboxCount}
       />
-      <h1 className="ml-3 text-lg font-semibold">Threads</h1>
+      <h1 className="ml-3 flex-1 text-lg font-semibold">Threads</h1>
+      <ThemeToggle />
     </header>
   );
 }
