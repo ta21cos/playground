@@ -38,8 +38,9 @@ function sanitize(html: string): string {
       "blockquote",
       "pre",
       "code",
+      "mark",
     ],
-    ALLOWED_ATTR: ["class"],
+    ALLOWED_ATTR: ["class", "style"],
   });
 }
 
@@ -51,24 +52,21 @@ export function CardViewer({
 }: CardViewerProps) {
   return (
     <div className="flex flex-col items-center">
-      <div className="perspective-1000 relative w-full">
+      <div className="w-full rounded-xl border bg-card p-6">
         <div
-          className={`relative w-full transition-transform duration-500 [transform-style:preserve-3d] ${showAnswer ? "[transform:rotateX(180deg)]" : ""}`}
-        >
-          <div className="backface-hidden flex min-h-[200px] items-center justify-center rounded-xl border bg-card p-6">
-            <div
-              className="text-center text-lg"
-              dangerouslySetInnerHTML={{ __html: sanitize(front) }}
-            />
-          </div>
+          className="text-center text-lg"
+          dangerouslySetInnerHTML={{ __html: sanitize(front) }}
+        />
 
-          <div className="backface-hidden absolute inset-0 flex min-h-[200px] items-center justify-center rounded-xl border bg-card p-6 [transform:rotateX(180deg)]">
+        {showAnswer && (
+          <>
+            <hr className="my-4 border-border" />
             <div
-              className="text-center text-lg"
+              className="text-center text-lg text-primary"
               dangerouslySetInnerHTML={{ __html: sanitize(back) }}
             />
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {!showAnswer && (
