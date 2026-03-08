@@ -162,7 +162,7 @@ export function MessageItem({
           </div>
         </div>
       ) : (
-        <div className="mt-0.5">
+        <div className="mt-0.5 cursor-pointer" onClick={handleOpenThread}>
           <MarkdownRenderer content={message.content} />
         </div>
       )}

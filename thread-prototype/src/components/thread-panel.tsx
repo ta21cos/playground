@@ -145,9 +145,11 @@ function ThreadReplyItem({
 function ThreadReplyInput({
   messageId,
   channelId,
+  onReplySent,
 }: {
   messageId: string;
   channelId: number;
+  onReplySent?: () => void;
 }) {
   const [content, setContent] = useState("");
   const [cursorPos, setCursorPos] = useState(0);
@@ -188,6 +190,7 @@ function ThreadReplyInput({
     setContent("");
     await createThreadReply(messageId, trimmed, channelId);
     setSending(false);
+    onReplySent?.();
     textareaRef.current?.focus();
   };
 
@@ -254,6 +257,11 @@ function ThreadPanelContent({
   const [replies, setReplies] = useState<ThreadMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const refreshReplies = useCallback(async () => {
+    const threadReplies = await getThreadReplies(messageId);
+    setReplies(threadReplies);
+  }, [messageId]);
 
   useEffect(() => {
     let mounted = true;
@@ -339,7 +347,11 @@ function ThreadPanelContent({
       </div>
 
       <div className="p-4">
-        <ThreadReplyInput messageId={messageId} channelId={channelId} />
+        <ThreadReplyInput
+          messageId={messageId}
+          channelId={channelId}
+          onReplySent={refreshReplies}
+        />
       </div>
     </div>
   );
