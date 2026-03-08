@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
+import Dexie from "dexie";
 import { db } from "@/lib/db";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
@@ -46,6 +48,16 @@ function DeckItem({ deck }: { deck: { id: string; name: string } }) {
     [deck.id],
   );
 
+  const [now] = useState(() => Date.now());
+  const dueCount = useLiveQuery(
+    () =>
+      db.cards
+        .where("[deckId+due]")
+        .between([deck.id, Dexie.minKey], [deck.id, now], true, true)
+        .count(),
+    [deck.id, now],
+  );
+
   return (
     <Link
       href={`/study/${deck.id}`}
@@ -55,7 +67,14 @@ function DeckItem({ deck }: { deck: { id: string; name: string } }) {
         <h2 className="font-medium">{deck.name}</h2>
         <p className="text-sm text-muted-foreground">{cardCount ?? 0} 枚</p>
       </div>
-      <BookOpen className="size-5 text-muted-foreground" />
+      <div className="flex items-center gap-2">
+        {(dueCount ?? 0) > 0 && (
+          <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground">
+            {dueCount}
+          </span>
+        )}
+        <BookOpen className="size-5 text-muted-foreground" />
+      </div>
     </Link>
   );
 }
