@@ -75,9 +75,9 @@ function ThreadReplyItem({
   };
 
   return (
-    <div className="group relative rounded-md px-3 py-2 hover:bg-muted/50">
+    <div className="group relative border-b border-border/50 px-3 py-3 hover:bg-muted/50">
       <div className="flex items-baseline gap-2">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground">
           {formatTimestamp(reply.createdAt)}
         </span>
         {isEdited && (

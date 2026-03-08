@@ -114,9 +114,10 @@ export function MessageItem({
     <div
       ref={highlightRef}
       id={`msg-${message.id}`}
-      className={`group relative rounded-md px-3 py-2 transition-colors duration-1000 hover:bg-muted/50 ${
+      className={`group relative cursor-pointer border-b border-border/50 px-3 py-3 transition-colors duration-1000 hover:bg-muted/50 ${
         selected ? "bg-primary/5 ring-1 ring-primary/20" : ""
       }`}
+      onClick={!editing ? handleOpenThread : undefined}
     >
       <div className="flex items-baseline gap-2">
         {selectionMode && (
@@ -124,10 +125,11 @@ export function MessageItem({
             type="checkbox"
             checked={selected ?? false}
             onChange={() => onToggleSelect?.(message.id)}
+            onClick={(e) => e.stopPropagation()}
             className="mt-0.5 shrink-0 rounded"
           />
         )}
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground">
           {formatTimestamp(message.createdAt)}
         </span>
         {isEdited && (
@@ -162,13 +164,16 @@ export function MessageItem({
           </div>
         </div>
       ) : (
-        <div className="mt-0.5 cursor-pointer" onClick={handleOpenThread}>
+        <div className="mt-0.5">
           <MarkdownRenderer content={message.content} />
         </div>
       )}
 
       {reactions && reactions.length > 0 && !editing && (
-        <div className="mt-1 flex flex-wrap gap-1">
+        <div
+          className="mt-1 flex flex-wrap gap-1"
+          onClick={(e) => e.stopPropagation()}
+        >
           {reactions.map((r) => (
             <button
               key={r.id}
@@ -191,7 +196,10 @@ export function MessageItem({
       )}
 
       {!editing && (
-        <div className="absolute -top-2 right-2 hidden gap-0.5 rounded-md border bg-background p-0.5 shadow-sm group-hover:flex">
+        <div
+          className="absolute -top-2 right-2 hidden gap-0.5 rounded-md border bg-background p-0.5 shadow-sm group-hover:flex"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Button
             variant="ghost"
             size="icon-xs"
