@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="108" fill="#18181b"/>
+  <!-- 吹き出しチェーン: 親→子→孫 のネスト感 -->
+  <g fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 親メッセージ -->
+    <rect x="100" y="110" width="260" height="70" rx="16"/>
+    <!-- 接続線 -->
+    <path d="M160,180 L160,210" stroke-width="4" opacity="0.5"/>
+    <!-- 子メッセージ (インデント) -->
+    <rect x="140" y="210" width="240" height="70" rx="16"/>
+    <!-- 接続線 -->
+    <path d="M200,280 L200,310" stroke-width="4" opacity="0.5"/>
+    <!-- 孫メッセージ (さらにインデント) -->
+    <rect x="180" y="310" width="220" height="70" rx="16"/>
+  </g>
+</svg>
