@@ -233,7 +233,7 @@ function ThreadReplyInput({
           size="icon"
           onClick={handleSubmit}
           disabled={!content.trim() || sending}
-          className="shrink-0 self-end"
+          className="h-[44px] w-[44px] shrink-0"
           aria-label="Send reply"
           title="Send reply"
         >
@@ -303,7 +303,7 @@ function ThreadPanelContent({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b px-4 py-3">
+      <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
         <div className="flex items-center gap-2">
           <MessageSquare className="h-4 w-4 text-muted-foreground" />
           <h3 className="font-semibold">Thread</h3>
@@ -321,20 +321,23 @@ function ThreadPanelContent({
 
       <div className="flex-1 overflow-y-auto">
         <div className="border-b px-4 py-3">
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs font-medium text-muted-foreground">
             {formatTimestamp(parentMessage.createdAt)}
           </div>
-          <div className="mt-1">
+          <div className="mt-0.5">
             <MarkdownRenderer content={parentMessage.content} />
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 p-2">
-          {replies.length > 0 && (
-            <p className="px-3 py-1 text-xs font-medium text-muted-foreground">
+        {replies.length > 0 && (
+          <div className="border-b px-4 py-2">
+            <p className="text-xs font-medium text-muted-foreground">
               {replies.length} {replies.length === 1 ? "reply" : "replies"}
             </p>
-          )}
+          </div>
+        )}
+
+        <div className="flex flex-col">
           {replies.map((reply) => (
             <ThreadReplyItem
               key={reply.id}
@@ -346,7 +349,7 @@ function ThreadPanelContent({
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="px-4 pb-4">
         <ThreadReplyInput
           messageId={messageId}
           channelId={channelId}

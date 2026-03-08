@@ -34,27 +34,33 @@ export default async function ChannelPage({
   ]);
 
   return (
-    <div className="flex h-full">
+    <div className="-m-6 flex h-[calc(100%+48px)]">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="border-b pb-4">
-          <div className="flex items-center gap-2">
-            <Hash className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-xl font-semibold">{channel.name}</h2>
+        <div className="flex h-14 shrink-0 items-center gap-2 border-b px-6">
+          <Hash className="h-5 w-5 text-muted-foreground" />
+          <div>
+            <h2 className="text-lg font-semibold leading-tight">
+              {channel.name}
+            </h2>
+            {channel.description && (
+              <p className="text-xs text-muted-foreground">
+                {channel.description}
+              </p>
+            )}
           </div>
-          {channel.description && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {channel.description}
-            </p>
-          )}
         </div>
         <CalendarView channelId={channelId} />
-        <MessageList
-          messages={messages}
-          threadReplyCounts={threadReplyCounts}
-          reactionsByMessage={reactionsByMessage}
-          highlightMessageId={highlight}
-        />
-        <MessageInput channelId={channelId} />
+        <div className="flex-1 overflow-auto px-6">
+          <MessageList
+            messages={messages}
+            threadReplyCounts={threadReplyCounts}
+            reactionsByMessage={reactionsByMessage}
+            highlightMessageId={highlight}
+          />
+        </div>
+        <div className="shrink-0 px-6 pb-4">
+          <MessageInput channelId={channelId} />
+        </div>
       </div>
       <Suspense>
         <ThreadPanel channelId={channelId} />

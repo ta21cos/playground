@@ -92,17 +92,13 @@ export function MessageInput({ channelId }: { channelId: number }) {
           size="icon"
           onClick={handleSubmit}
           disabled={!content.trim() || sending}
-          className="shrink-0 self-end"
+          className="h-[44px] w-[44px] shrink-0"
           aria-label="Send message"
           title="Send message"
         >
           <Send className="h-4 w-4" />
         </Button>
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Markdown supported. Press Cmd+Enter to send. Type :emoji for
-        suggestions.
-      </p>
     </div>
   );
 }
