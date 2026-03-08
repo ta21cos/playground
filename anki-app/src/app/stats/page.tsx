@@ -59,22 +59,22 @@ export default function StatsPage() {
 
       <div className="grid grid-cols-2 gap-3">
         <StatCard
-          icon={<CheckCircle2 className="size-5 text-green-500" />}
+          icon={<CheckCircle2 className="size-5 text-stat-today" />}
           label="今日の復習"
           value={reviewedToday}
         />
         <StatCard
-          icon={<Clock className="size-5 text-orange-500" />}
+          icon={<Clock className="size-5 text-stat-due" />}
           label="復習待ち"
           value={dueCards}
         />
         <StatCard
-          icon={<BookOpen className="size-5 text-blue-500" />}
+          icon={<BookOpen className="size-5 text-stat-total" />}
           label="総カード数"
           value={totalCards}
         />
         <StatCard
-          icon={<BarChart3 className="size-5 text-purple-500" />}
+          icon={<BarChart3 className="size-5 text-stat-deck" />}
           label="デッキ数"
           value={deckCount ?? 0}
         />
@@ -87,19 +87,19 @@ export default function StatsPage() {
             label="新規"
             count={newCards ?? 0}
             total={totalCards}
-            color="bg-blue-500"
+            color="bg-state-new"
           />
           <StateBar
             label="学習中"
             count={learningCards ?? 0}
             total={totalCards}
-            color="bg-orange-500"
+            color="bg-state-learning"
           />
           <StateBar
             label="復習"
             count={reviewCards ?? 0}
             total={totalCards}
-            color="bg-green-500"
+            color="bg-state-review"
           />
         </div>
       </div>

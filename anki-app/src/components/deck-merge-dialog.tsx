@@ -65,13 +65,13 @@ export function DeckMergeDialog() {
 
   if (state.status === "success") {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950">
+      <div className="rounded-lg border border-success-border bg-success-muted p-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-green-900 dark:text-green-100">
+          <p className="text-sm font-medium text-success-muted-foreground">
             {state.count} 枚のカードをマージしました
           </p>
           <button onClick={() => setState({ status: "idle" })}>
-            <X className="size-4 text-green-600" />
+            <X className="size-4 text-success" />
           </button>
         </div>
       </div>
@@ -80,13 +80,13 @@ export function DeckMergeDialog() {
 
   if (state.status === "error") {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
+      <div className="rounded-lg border border-error-border bg-error-muted p-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-red-900 dark:text-red-100">
+          <p className="text-sm font-medium text-error-muted-foreground">
             {state.message}
           </p>
           <button onClick={() => setState({ status: "idle" })}>
-            <X className="size-4 text-red-600" />
+            <X className="size-4 text-error" />
           </button>
         </div>
       </div>

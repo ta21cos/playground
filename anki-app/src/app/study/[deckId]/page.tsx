@@ -92,7 +92,7 @@ export default function StudyPage({
   if (!currentCard) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6">
-        <CheckCircle2 className="size-12 text-green-500" />
+        <CheckCircle2 className="size-12 text-success" />
         <h1 className="text-xl font-semibold">学習完了！</h1>
         <p className="text-center text-muted-foreground">
           「{deck.name}」の今日のカードはすべて復習しました

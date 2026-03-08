@@ -142,13 +142,13 @@ export default function ImportPage() {
       )}
 
       {state.status === "success" && (
-        <div className="mt-4 flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950">
-          <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-green-600 dark:text-green-400" />
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-success-border bg-success-muted p-4">
+          <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" />
           <div>
-            <p className="font-medium text-green-900 dark:text-green-100">
+            <p className="font-medium text-success-muted-foreground">
               インポート完了
             </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <p className="text-sm text-success-muted-foreground/80">
               「{state.result.deckName}」に {state.result.importedCount}{" "}
               枚のカードを追加しました
             </p>
@@ -157,11 +157,11 @@ export default function ImportPage() {
       )}
 
       {state.status === "error" && (
-        <div className="mt-4 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
-          <AlertCircle className="mt-0.5 size-5 shrink-0 text-red-600 dark:text-red-400" />
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-error-border bg-error-muted p-4">
+          <AlertCircle className="mt-0.5 size-5 shrink-0 text-error" />
           <div>
-            <p className="font-medium text-red-900 dark:text-red-100">エラー</p>
-            <p className="text-sm text-red-700 dark:text-red-300">
+            <p className="font-medium text-error-muted-foreground">エラー</p>
+            <p className="text-sm text-error-muted-foreground/80">
               {state.message}
             </p>
           </div>
