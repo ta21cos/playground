@@ -1,0 +1,192 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+#app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #c0c0e0;
+}
+
+#refresh-btn {
+  background: none;
+  border: 1px solid #3a3a5a;
+  color: #a0a0c0;
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#refresh-btn:hover {
+  background: #2a2a4a;
+  color: #fff;
+}
+
+#sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.session-card {
+  background: #22223a;
+  border: 1px solid #2a2a4a;
+  border-radius: 10px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.session-card:hover {
+  background: #2a2a4e;
+  border-color: #4a4a7a;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.running {
+  background: #4ade80;
+  box-shadow: 0 0 6px #4ade8066;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.waiting {
+  background: #facc15;
+  box-shadow: 0 0 6px #facc1566;
+  animation: pulse 3s infinite;
+}
+
+.status-dot.idle {
+  background: #64748b;
+}
+
+.status-dot.dead {
+  background: #475569;
+  opacity: 0.5;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.session-info {
+  min-width: 0;
+}
+
+.session-project {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-branch-line {
+  margin-top: 3px;
+}
+
+.session-branch {
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "SF Mono", Menlo, monospace;
+  color: #b0a0e0;
+  background: #9d8dcc15;
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
+.session-branch::before {
+  content: "\2387 ";
+  opacity: 0.6;
+}
+
+.session-meta {
+  font-size: 11px;
+  color: #8888aa;
+  margin-top: 4px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.session-preview {
+  font-size: 12px;
+  color: #7777aa;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-status-label {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.session-status-label.running {
+  background: #4ade8020;
+  color: #4ade80;
+}
+
+.session-status-label.waiting {
+  background: #facc1520;
+  color: #facc15;
+}
+
+.session-status-label.idle {
+  background: #64748b20;
+  color: #94a3b8;
+}
+
+.session-status-label.dead {
+  background: #47556920;
+  color: #64748b;
+}
+
+.empty-state {
+  text-align: center;
+  color: #6666aa;
+  padding: 60px 20px;
+  font-size: 14px;
+}
