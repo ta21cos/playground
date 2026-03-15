@@ -1,0 +1,746 @@
+[
+  {
+    "card_id": "45281",
+    "name": "ヒーローマント",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV5M/045281_T_HIROMANTO.jpg",
+    "regulation": "SV5M",
+    "card_number": "064/071",
+    "rarity": "",
+    "illustrator": "Toyste Beach",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "",
+    "hp": null,
+    "type": [],
+    "card_category": "ポケモンのどうぐ",
+    "effect_text": "このカードをつけているポケモンの最大HPは「＋100」される。",
+    "rule_text": "ポケモンのどうぐは、自分の番に何枚でも、自分のポケモンにつけられる。ポケモン1匹につき1枚だけつけられ、つけたままにする。",
+    "special_rule": "ACE SPECのカードは、デッキに1枚しか入れられない。",
+    "abilities": [],
+    "moves": [],
+    "weakness": "",
+    "resistance": "",
+    "retreat_cost": 0,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「サイバージャッジ」",
+        "url": "https://www.pokemon-card.com/products/sv/sv5.html"
+      }
+    ],
+    "canonical_id": "a265ab66f5f800e8"
+  },
+  {
+    "card_id": "45287",
+    "name": "フルメタルラボ",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV5M/045287_T_FURUMETARURABO.jpg",
+    "regulation": "SV5M",
+    "card_number": "070/071",
+    "rarity": "u_c",
+    "illustrator": "AYUMI ODASHIMA",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "",
+    "hp": null,
+    "type": [],
+    "card_category": "スタジアム",
+    "effect_text": "おたがいのポケモンが、相手のポケモンから受けるワザのダメージは「-30」される。",
+    "rule_text": "スタジアムは、自分の番に1枚、バトル場の横に出せる。別のスタジアムが場に出たなら、このカードをトラッシュする。同じ名前のスタジアムは場に出せない。",
+    "special_rule": "",
+    "abilities": [],
+    "moves": [],
+    "weakness": "",
+    "resistance": "",
+    "retreat_cost": 0,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「サイバージャッジ」",
+        "url": "https://www.pokemon-card.com/products/sv/sv5.html"
+      }
+    ],
+    "canonical_id": "6459f7339c569258"
+  },
+  {
+    "card_id": "45288",
+    "name": "ミストエネルギー",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV5M/045288_E_MISUTOENERUGI.jpg",
+    "regulation": "SV5M",
+    "card_number": "071/071",
+    "rarity": "u_c",
+    "illustrator": "",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "",
+    "hp": null,
+    "type": [],
+    "card_category": "特殊エネルギー",
+    "effect_text": "このカードは、ポケモンについているかぎり、エネルギー1個ぶんとしてはたらく。このカードをつけているポケモンは、相手のポケモンが使うワザの効果を受けない。（すでに受けている効果は、なくならない。）",
+    "rule_text": "",
+    "special_rule": "",
+    "abilities": [],
+    "moves": [],
+    "weakness": "",
+    "resistance": "",
+    "retreat_cost": 0,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「サイバージャッジ」",
+        "url": "https://www.pokemon-card.com/products/sv/sv5.html"
+      }
+    ],
+    "canonical_id": "3b20633e2c8c16c3"
+  },
+  {
+    "card_id": "46373",
+    "name": "ピカチュウex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV8/046373_P_PIKACHIXYUUEX.jpg",
+    "regulation": "SV8",
+    "card_number": "033/106",
+    "rarity": "rr",
+    "illustrator": "aky CG Works",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 200,
+    "type": [
+      "雷"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [
+      {
+        "name": "がんばりハート",
+        "description": "このポケモンのHPがまんたんの状態で、このポケモンがワザのダメージを受けてきぜつするとき、きぜつせず、残りHPが「10」の状態で場に残る。"
+      }
+    ],
+    "moves": [
+      {
+        "name": "トパーズボルト",
+        "energy_cost": [
+          "草",
+          "雷",
+          "鋼"
+        ],
+        "damage": "300",
+        "description": "このポケモンについているエネルギーを3個選び、トラッシュする。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 1,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「超電ブレイカー」",
+        "url": "https://www.pokemon-card.com/ex/sv8/"
+      }
+    ],
+    "canonical_id": "140c46bed98343e7"
+  },
+  {
+    "card_id": "47620",
+    "name": "博士の研究",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV11B/047620_T_HAKASENOKENKIXYUU.jpg",
+    "regulation": "SV11B",
+    "card_number": "084/086",
+    "rarity": "u_c",
+    "illustrator": "Taira Akitsu",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "",
+    "hp": null,
+    "type": [],
+    "card_category": "サポート",
+    "effect_text": "自分の手札をすべてトラッシュし、山札を7枚引く。",
+    "rule_text": "サポートは、自分の番に1枚しか使えない。",
+    "special_rule": "",
+    "abilities": [],
+    "moves": [],
+    "weakness": "",
+    "resistance": "",
+    "retreat_cost": 0,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「ブラックボルト」",
+        "url": "https://www.pokemon-card.com/ex/sv11/"
+      },
+      {
+        "name": "「ブラックボルト・ホワイトフレア」デッキ構築戦で使用可能なカード",
+        "url": "https://www.pokemon-card.com/card-search/index.php?regulation_detail=all&pg=10965"
+      }
+    ],
+    "canonical_id": "811b6c8731fdadf9"
+  },
+  {
+    "card_id": "50111",
+    "name": "メリープ",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M4/050111_P_MERIPU.jpg",
+    "regulation": "M4",
+    "card_number": "027/083",
+    "rarity": "c_c",
+    "illustrator": "UKUMO uiti",
+    "pokedex_info": "No.179　わたげポケモン",
+    "flavor_text": "ふわふわの 体毛は 静電気が 溜まると ２倍に ふくらむ。 触ると 感電してしまう。",
+    "stage": "たね",
+    "hp": 70,
+    "type": [
+      "雷"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "でんじは",
+        "energy_cost": [
+          "雷",
+          "無"
+        ],
+        "damage": "20",
+        "description": "コインを1回投げオモテなら、相手のバトルポケモンをマヒにする。"
+      }
+    ],
+    "special_rule": "",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [
+      {
+        "name": "デンリュウ",
+        "is_current": false
+      },
+      {
+        "name": "モココ",
+        "is_current": false
+      },
+      {
+        "name": "メリープ",
+        "is_current": true
+      }
+    ],
+    "packs": [
+      {
+        "name": "拡張パック「ニンジャスピナー」",
+        "url": "https://www.pokemon-card.com/ex/m4/"
+      }
+    ],
+    "canonical_id": "a2e0acf30820c68c"
+  },
+  {
+    "card_id": "50112",
+    "name": "モココ",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M4/050112_P_MOKOKO.jpg",
+    "regulation": "M4",
+    "card_number": "028/083",
+    "rarity": "c_c",
+    "illustrator": "miki kudo",
+    "pokedex_info": "No.180　わたげポケモン",
+    "flavor_text": "体毛に 溜めた 電気が 満タンになると 尻尾が 光る。 触れると しびれる 毛を 飛ばす。",
+    "stage": "1 進化",
+    "hp": 90,
+    "type": [
+      "雷"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "でんじしょうがい",
+        "energy_cost": [
+          "雷",
+          "無"
+        ],
+        "damage": "40",
+        "description": "次の相手の番、相手は手札からグッズを出して使えない。"
+      }
+    ],
+    "special_rule": "",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [
+      {
+        "name": "デンリュウ",
+        "is_current": false
+      },
+      {
+        "name": "モココ",
+        "is_current": true
+      },
+      {
+        "name": "メリープ",
+        "is_current": false
+      }
+    ],
+    "packs": [
+      {
+        "name": "拡張パック「ニンジャスピナー」",
+        "url": "https://www.pokemon-card.com/ex/m4/"
+      }
+    ],
+    "canonical_id": "5a9c155b1aac6a55"
+  },
+  {
+    "card_id": "45278",
+    "name": "ハンドトリマー",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV5M/045278_T_HANDOTORIMA.jpg",
+    "regulation": "SV5M",
+    "card_number": "061/071",
+    "rarity": "u_c",
+    "illustrator": "Ayaka Yoshida",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "",
+    "hp": null,
+    "type": [],
+    "card_category": "グッズ",
+    "effect_text": "おたがいのプレイヤーは、それぞれ自分の手札が5枚になるようにトラッシュする。（トラッシュは相手から行う。手札が5枚以下のプレイヤーはトラッシュしない。）",
+    "rule_text": "グッズは、自分の番に何枚でも使える。",
+    "special_rule": "",
+    "abilities": [],
+    "moves": [],
+    "weakness": "",
+    "resistance": "",
+    "retreat_cost": 0,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「サイバージャッジ」",
+        "url": "https://www.pokemon-card.com/products/sv/sv5.html"
+      }
+    ],
+    "canonical_id": "c7b3d2f0b3b3907f"
+  },
+  {
+    "card_id": "46027",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV7/046027_P_TERAPAGOSUEX.jpg",
+    "regulation": "SV7",
+    "card_number": "088/102",
+    "rarity": "rr",
+    "illustrator": "5ban Graphics",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「ステラミラクル」",
+        "url": "https://www.pokemon-card.com/ex/sv7/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  },
+  {
+    "card_id": "46170",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV7/046170_P_TERAPAGOSUEX.jpg",
+    "regulation": "SV7",
+    "card_number": "122/102",
+    "rarity": "sr_c",
+    "illustrator": "5ban Graphics",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「ステラミラクル」",
+        "url": "https://www.pokemon-card.com/ex/sv7/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  },
+  {
+    "card_id": "46178",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV7/046178_P_TERAPAGOSUEX.jpg",
+    "regulation": "SV7",
+    "card_number": "130/102",
+    "rarity": "sar",
+    "illustrator": "Saboteri",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「ステラミラクル」",
+        "url": "https://www.pokemon-card.com/ex/sv7/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  },
+  {
+    "card_id": "46181",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV7/046181_P_TERAPAGOSUEX.jpg",
+    "regulation": "SV7",
+    "card_number": "133/102",
+    "rarity": "ur_c",
+    "illustrator": "5ban Graphics",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "拡張パック「ステラミラクル」",
+        "url": "https://www.pokemon-card.com/ex/sv7/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  },
+  {
+    "card_id": "46797",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV8a/046797_P_TERAPAGOSUEX.jpg",
+    "regulation": "SV8a",
+    "card_number": "136/187",
+    "rarity": "rr",
+    "illustrator": "5ban Graphics",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "ハイクラスパック「テラスタルフェスex」",
+        "url": "https://www.pokemon-card.com/ex/sv8a/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  },
+  {
+    "card_id": "47147",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV8a/047147_P_TERAPAGOSUEX.jpg",
+    "regulation": "SV8a",
+    "card_number": "226/187",
+    "rarity": "sar",
+    "illustrator": "mashu",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "ハイクラスパック「テラスタルフェスex」",
+        "url": "https://www.pokemon-card.com/ex/sv8a/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  },
+  {
+    "card_id": "47158",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SV8a/047158_P_TERAPAGOSUEX.jpg",
+    "regulation": "SV8a",
+    "card_number": "237/187",
+    "rarity": "ur_c",
+    "illustrator": "5ban Graphics",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "ハイクラスパック「テラスタルフェスex」",
+        "url": "https://www.pokemon-card.com/ex/sv8a/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  },
+  {
+    "card_id": "48667",
+    "name": "テラパゴスex",
+    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M2a/048667_P_TERAPAGOSUEX.jpg",
+    "regulation": "M2a",
+    "card_number": "145/193",
+    "rarity": "rr",
+    "illustrator": "5ban Graphics",
+    "pokedex_info": "",
+    "flavor_text": "",
+    "stage": "たね",
+    "hp": 230,
+    "type": [
+      "無"
+    ],
+    "card_category": "ポケモン",
+    "effect_text": "",
+    "rule_text": "",
+    "abilities": [],
+    "moves": [
+      {
+        "name": "ユニオンビート",
+        "energy_cost": [
+          "無",
+          "無"
+        ],
+        "damage": "30×",
+        "description": "このワザは、後攻プレイヤーの最初の番には使えない。自分のベンチポケモンの数×30ダメージ。"
+      },
+      {
+        "name": "クラウンオパール",
+        "energy_cost": [
+          "草",
+          "水",
+          "雷"
+        ],
+        "damage": "180",
+        "description": "次の相手の番、このポケモンはたねポケモン（ポケモンをのぞく）からワザのダメージを受けない。"
+      }
+    ],
+    "special_rule": "ポケモンexがきぜつしたとき、相手はサイドを2枚とる。",
+    "weakness": "闘×2",
+    "resistance": "--",
+    "retreat_cost": 2,
+    "evolutions": [],
+    "packs": [
+      {
+        "name": "ハイクラスパック 「MEGAドリームex」",
+        "url": "https://www.pokemon-card.com/ex/m2a/"
+      }
+    ],
+    "canonical_id": "c0b381a1e3a5ae2a"
+  }
+]
