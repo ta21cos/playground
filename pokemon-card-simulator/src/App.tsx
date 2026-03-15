@@ -34,6 +34,7 @@ import { promoteToBattle, needsBenchSelector } from "./domain/battle-bench-swap"
 import { adjustOpponentSide } from "./domain/opponent-side";
 import { resetGame } from "./domain/reset";
 import { takeSnapshot, restoreSnapshot } from "./store/snapshot";
+import { fetchDeckFromCode, type DeckCodeResult } from "./domain/deck-code-parser";
 import cardsData from "./data/cards.json";
 import "./styles/index.css";
 
@@ -47,11 +48,14 @@ interface AppState {
   modal: Modal;
   contextMenu: { x: number; y: number; instanceId: string; zone: ZoneName } | null;
   warning: string | null;
+  loading: boolean;
 }
 
 type Action =
   | { type: "SET_GAME"; game: GameState; pushHistory?: boolean }
   | { type: "IMPORT_DECK"; text: string }
+  | { type: "IMPORT_DECK_CODE_RESULT"; result: DeckCodeResult }
+  | { type: "SET_LOADING"; loading: boolean }
   | { type: "SETUP" }
   | { type: "MULLIGAN" }
   | { type: "START_GAME" }
@@ -116,11 +120,55 @@ function appReducer(state: AppState, action: Action): AppState {
             game.deckCards.push(entry.card);
           }
         }
-        return { ...state, game, history: [], warning: null };
+        return { ...state, game, history: [], warning: null, loading: false };
       } catch (e) {
         return { ...state, warning: (e as Error).message };
       }
     }
+
+    case "IMPORT_DECK_CODE_RESULT": {
+      const { result } = action;
+      const game = createInitialGameState();
+      game.phase = "デッキ読込済";
+      game.deckCards = [];
+      let codeCounter = 0;
+      for (const entry of result.entries) {
+        const resolvedCards = resolver.findByName(entry.name);
+        const card: CardType = resolvedCards.length > 0
+          ? resolvedCards[0]!
+          : {
+              card_id: entry.cardId,
+              name: entry.name,
+              card_category: "グッズ",
+              image_url: entry.imageUrl,
+              regulation: "",
+              card_number: "",
+              rarity: "",
+              canonical_id: entry.cardId,
+              effect_text: "",
+              rule_text: "",
+            } as CardType;
+
+        for (let i = 0; i < entry.count; i++) {
+          const id = `inst-${++codeCounter}`;
+          const instance: CardInstance = {
+            instanceId: id,
+            card: { ...card, image_url: entry.imageUrl || card.image_url },
+            attachedEnergies: [],
+            attachedTool: null,
+            evolutionStack: [],
+            damageCounters: 0,
+          };
+          game.cardInstances[id] = instance;
+          game.zones.山札.push(id);
+          game.deckCards.push(instance.card);
+        }
+      }
+      return { ...state, game, history: [], warning: null, loading: false };
+    }
+
+    case "SET_LOADING":
+      return { ...state, loading: action.loading };
 
     case "SETUP":
       return withHistory(state, setupGame(state.game));
@@ -255,11 +303,24 @@ const initialAppState: AppState = {
   modal: null,
   contextMenu: null,
   warning: null,
+  loading: false,
 };
 
 function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState);
   const { game, modal, contextMenu, warning } = state;
+
+  const handleImportCode = useCallback(async (code: string) => {
+    dispatch({ type: "SET_LOADING", loading: true });
+    try {
+      const result = await fetchDeckFromCode(code);
+      dispatch({ type: "IMPORT_DECK_CODE_RESULT", result });
+    } catch (e) {
+      dispatch({ type: "SET_LOADING", loading: false });
+      dispatch({ type: "SET_GAME", game: { ...state.game } });
+      alert((e as Error).message);
+    }
+  }, [state.game]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -387,7 +448,12 @@ function App() {
       <div className="app">
         <h1 style={{ textAlign: "center", padding: "16px" }}>ポケモンカード一人回し</h1>
         {warning && <div className="warning" style={{ color: "#e74c3c", textAlign: "center", padding: "8px" }}>{warning}</div>}
-        <DeckImport onImport={(text) => dispatch({ type: "IMPORT_DECK", text })} />
+        <DeckImport
+          onImportText={(text) => dispatch({ type: "IMPORT_DECK", text })}
+          onImportCode={handleImportCode}
+          loading={state.loading}
+          error={warning}
+        />
       </div>
     );
   }

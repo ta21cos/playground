@@ -3,7 +3,6 @@ import {
   startGameWithSeed,
   dragCardToZone,
   getZone,
-  getCardInZone,
 } from "./helpers";
 
 test.describe("FR-17: エネルギー付与（DnD）", () => {

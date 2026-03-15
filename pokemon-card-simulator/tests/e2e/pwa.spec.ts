@@ -4,14 +4,6 @@ test.describe("NFR-1: PWA オフライン対応", () => {
   test("Service Worker が登録される", async ({ page }) => {
     await page.goto("/");
 
-    const swRegistered = await page.evaluate(async () => {
-      if (!("serviceWorker" in navigator)) return false;
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      return registrations.length > 0;
-    });
-
-    // dev モードでは SW は登録されない場合がある（ビルド後のみ）
-    // ここでは SW API が利用可能であることを確認
     const hasSWApi = await page.evaluate(() => "serviceWorker" in navigator);
     expect(hasSWApi).toBe(true);
   });

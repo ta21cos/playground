@@ -3,7 +3,6 @@ import {
   startGameWithSeed,
   dragCardToZone,
   getZone,
-  clickCard,
 } from "./helpers";
 
 test.describe("FR-31: 付与カードの個別取り外し", () => {
