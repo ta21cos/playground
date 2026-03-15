@@ -1,0 +1,44 @@
+[project]
+name = "pokemon-card-kifu"
+version = "0.1.0"
+description = "ポケモンカード対戦棋譜自動生成CLIツール"
+requires-python = ">=3.12"
+dependencies = [
+    "opencv-python-headless>=4.9",
+    "imagehash>=4.3",
+    "google-genai>=1.0",
+    "pydantic>=2.0",
+]
+
+[project.scripts]
+kifu = "kifu.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kifu"]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1",
+    "ruff>=0.4",
+    "pytest>=8.0",
+]
