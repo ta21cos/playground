@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ゾーン座標設定エディタ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; display: flex; height: 100vh; }
+
+  .sidebar {
+    width: 320px; min-width: 320px; padding: 16px; background: #16213e;
+    overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+  }
+  h1 { font-size: 16px; color: #a0c4ff; }
+  h2 { font-size: 13px; color: #8899aa; margin-top: 8px; }
+
+  .controls { display: flex; flex-direction: column; gap: 8px; }
+  .controls label { font-size: 12px; color: #8899aa; }
+  .controls select, .controls input[type="file"], .controls button {
+    padding: 6px 10px; border: 1px solid #334; border-radius: 4px;
+    background: #0f3460; color: #e0e0e0; font-size: 13px; cursor: pointer;
+  }
+  .controls button:hover { background: #1a5276; }
+  .controls button.primary { background: #2e86de; border-color: #2e86de; }
+  .controls button.primary:hover { background: #54a0ff; }
+  .controls button.danger { background: #6b2020; border-color: #6b2020; }
+  .controls button.danger:hover { background: #993333; }
+
+  .player-tabs { display: flex; gap: 4px; }
+  .player-tabs button {
+    flex: 1; padding: 6px; border: 1px solid #334; border-radius: 4px;
+    background: #0f3460; color: #e0e0e0; font-size: 13px; cursor: pointer;
+  }
+  .player-tabs button.active { background: #2e86de; border-color: #2e86de; }
+
+  .zone-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .zone-item {
+    display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+    background: #0f3460; border: 1px solid #334; border-radius: 4px;
+    font-size: 12px; cursor: pointer;
+  }
+  .zone-item:hover { border-color: #54a0ff; }
+  .zone-item.active { border-color: #2e86de; background: #1a5276; }
+  .zone-item.defined { border-left: 3px solid #27ae60; }
+  .zone-item .name { flex: 1; }
+  .zone-item .coords { font-size: 11px; color: #8899aa; }
+  .zone-item .delete-btn {
+    background: none; border: none; color: #e74c3c; cursor: pointer;
+    font-size: 14px; padding: 0 4px; display: none;
+  }
+  .zone-item.defined .delete-btn { display: inline; }
+
+  .canvas-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    overflow: auto; position: relative; padding: 16px;
+  }
+  .canvas-wrapper { position: relative; display: inline-block; }
+  canvas { display: block; cursor: crosshair; }
+
+  .help { font-size: 11px; color: #667; line-height: 1.5; }
+  .export-area { margin-top: auto; }
+  .export-area textarea {
+    width: 100%; height: 80px; background: #0a0a1a; border: 1px solid #334;
+    border-radius: 4px; color: #8899aa; font-size: 11px; font-family: monospace;
+    padding: 6px; resize: vertical;
+  }
+
+  .drop-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(46, 134, 222, 0.3); display: none;
+    align-items: center; justify-content: center;
+    font-size: 24px; color: #fff; z-index: 100;
+    pointer-events: none;
+  }
+  .drop-overlay.visible { display: flex; }
+</style>
+</head>
+<body>
+
+<div class="drop-overlay" id="dropOverlay">画像をドロップ</div>
+
+<div class="sidebar">
+  <h1>ゾーン座標設定エディタ</h1>
+
+  <div class="controls">
+    <label>画像を選択（またはドラッグ&ドロップ）</label>
+    <input type="file" id="imageInput" accept="image/*">
+  </div>
+
+  <div class="controls">
+    <label>プレイヤー</label>
+    <div class="player-tabs">
+      <button class="active" data-player="1">Player 1（上側）</button>
+      <button data-player="2">Player 2（下側）</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label>ゾーンを選択してから画像上でドラッグ</label>
+  </div>
+
+  <div class="zone-list" id="zoneList"></div>
+
+  <div class="help">
+    操作: ゾーンを選択 → 画像上でドラッグして矩形を描画<br>
+    右クリック: 矩形を削除<br>
+    既存JSONをインポートすることも可能
+  </div>
+
+  <div class="controls">
+    <button id="importBtn">JSONインポート</button>
+    <input type="file" id="importInput" accept=".json" style="display:none">
+  </div>
+
+  <div class="export-area">
+    <div class="controls">
+      <button class="primary" id="exportBtn">JSONエクスポート</button>
+      <button class="danger" id="clearBtn">全クリア</button>
+    </div>
+    <textarea id="exportArea" readonly placeholder="エクスポート結果がここに表示されます"></textarea>
+  </div>
+</div>
+
+<div class="canvas-area" id="canvasArea">
+  <div class="canvas-wrapper">
+    <canvas id="canvas"></canvas>
+  </div>
+</div>
+
+<script>
+const ZONES = [
+  { key: 'active', label: 'バトル場' },
+  { key: 'bench_1', label: 'ベンチ1' },
+  { key: 'bench_2', label: 'ベンチ2' },
+  { key: 'bench_3', label: 'ベンチ3' },
+  { key: 'bench_4', label: 'ベンチ4' },
+  { key: 'bench_5', label: 'ベンチ5' },
+  { key: 'side', label: 'サイド' },
+  { key: 'deck', label: '山札' },
+  { key: 'discard', label: 'トラッシュ' },
+  { key: 'stadium', label: 'スタジアム' },
+];
+
+const ZONE_COLORS = {
+  active: '#e74c3c', bench_1: '#e67e22', bench_2: '#f1c40f',
+  bench_3: '#2ecc71', bench_4: '#1abc9c', bench_5: '#3498db',
+  side: '#9b59b6', deck: '#e91e63', discard: '#795548', stadium: '#607d8b',
+};
+
+let state = {
+  image: null,
+  currentPlayer: 1,
+  currentZone: 'active',
+  zones: { 1: {}, 2: {} },
+  drawing: false,
+  startX: 0, startY: 0,
+  scale: 1,
+};
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const zoneList = document.getElementById('zoneList');
+
+function buildZoneList() {
+  zoneList.innerHTML = '';
+  for (const zone of ZONES) {
+    const item = document.createElement('div');
+    item.className = 'zone-item';
+    if (zone.key === state.currentZone) item.classList.add('active');
+
+    const data = state.zones[state.currentPlayer][zone.key];
+    if (data) item.classList.add('defined');
+
+    const color = ZONE_COLORS[zone.key];
+    item.innerHTML = `
+      <span style="color:${color}">■</span>
+      <span class="name">${zone.label}</span>
+      <span class="coords">${data ? `${data.x},${data.y} ${data.w}x${data.h}` : '未設定'}</span>
+      <span class="delete-btn" title="削除">&times;</span>
+    `;
+
+    item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-btn')) {
+        delete state.zones[state.currentPlayer][zone.key];
+        buildZoneList();
+        draw();
+        return;
+      }
+      state.currentZone = zone.key;
+      buildZoneList();
+    });
+
+    zoneList.appendChild(item);
+  }
+}
+
+function draw() {
+  if (!state.image) {
+    canvas.width = 600;
+    canvas.height = 400;
+    ctx.fillStyle = '#0f3460';
+    ctx.fillRect(0, 0, 600, 400);
+    ctx.fillStyle = '#8899aa';
+    ctx.font = '16px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('画像をドラッグ&ドロップまたは選択してください', 300, 200);
+    return;
+  }
+
+  const area = document.getElementById('canvasArea');
+  const maxW = area.clientWidth - 32;
+  const maxH = area.clientHeight - 32;
+  state.scale = Math.min(maxW / state.image.width, maxH / state.image.height, 1);
+
+  canvas.width = state.image.width * state.scale;
+  canvas.height = state.image.height * state.scale;
+
+  ctx.drawImage(state.image, 0, 0, canvas.width, canvas.height);
+
+  for (const player of [1, 2]) {
+    const zones = state.zones[player];
+    const alpha = player === state.currentPlayer ? 0.35 : 0.15;
+    const lineWidth = player === state.currentPlayer ? 2 : 1;
+
+    for (const [key, rect] of Object.entries(zones)) {
+      const color = ZONE_COLORS[key] || '#ffffff';
+      const sx = rect.x * state.scale;
+      const sy = rect.y * state.scale;
+      const sw = rect.w * state.scale;
+      const sh = rect.h * state.scale;
+
+      ctx.fillStyle = color + Math.round(alpha * 255).toString(16).padStart(2, '0');
+      ctx.fillRect(sx, sy, sw, sh);
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      if (key === state.currentZone && player === state.currentPlayer) {
+        ctx.setLineDash([4, 4]);
+      } else {
+        ctx.setLineDash([]);
+      }
+      ctx.strokeRect(sx, sy, sw, sh);
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = color;
+      ctx.font = `bold ${11 * (state.scale > 0.5 ? 1 : 1.5)}px system-ui`;
+      ctx.textAlign = 'left';
+      const label = `P${player} ${ZONES.find(z => z.key === key)?.label || key}`;
+      const textY = sy > 14 ? sy - 3 : sy + sh + 13;
+      ctx.fillText(label, sx + 2, textY);
+    }
+  }
+}
+
+function getImageCoords(e) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: Math.round((e.clientX - rect.left) / state.scale),
+    y: Math.round((e.clientY - rect.top) / state.scale),
+  };
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  if (e.button === 2) return;
+  if (!state.image) return;
+  state.drawing = true;
+  const coords = getImageCoords(e);
+  state.startX = coords.x;
+  state.startY = coords.y;
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!state.drawing) return;
+  const coords = getImageCoords(e);
+  const x = Math.min(state.startX, coords.x);
+  const y = Math.min(state.startY, coords.y);
+  const w = Math.abs(coords.x - state.startX);
+  const h = Math.abs(coords.y - state.startY);
+
+  state.zones[state.currentPlayer][state.currentZone] = { x, y, w, h };
+  draw();
+
+  ctx.strokeStyle = ZONE_COLORS[state.currentZone] || '#fff';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 3]);
+  ctx.strokeRect(x * state.scale, y * state.scale, w * state.scale, h * state.scale);
+  ctx.setLineDash([]);
+});
+
+canvas.addEventListener('mouseup', () => {
+  if (!state.drawing) return;
+  state.drawing = false;
+  buildZoneList();
+  draw();
+
+  const zoneKeys = ZONES.map(z => z.key);
+  const currentIdx = zoneKeys.indexOf(state.currentZone);
+  const playerZones = state.zones[state.currentPlayer];
+  for (let i = currentIdx + 1; i < zoneKeys.length; i++) {
+    if (!playerZones[zoneKeys[i]]) {
+      state.currentZone = zoneKeys[i];
+      buildZoneList();
+      return;
+    }
+  }
+});
+
+canvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  if (!state.image) return;
+  const coords = getImageCoords(e);
+  const player = state.currentPlayer;
+  for (const [key, rect] of Object.entries(state.zones[player])) {
+    if (coords.x >= rect.x && coords.x <= rect.x + rect.w &&
+        coords.y >= rect.y && coords.y <= rect.y + rect.h) {
+      delete state.zones[player][key];
+      buildZoneList();
+      draw();
+      return;
+    }
+  }
+});
+
+document.querySelectorAll('.player-tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.player-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.currentPlayer = parseInt(btn.dataset.player);
+    buildZoneList();
+    draw();
+  });
+});
+
+function loadImageFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      state.image = img;
+      draw();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById('imageInput').addEventListener('change', (e) => {
+  if (e.target.files[0]) loadImageFile(e.target.files[0]);
+});
+
+document.body.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  document.getElementById('dropOverlay').classList.add('visible');
+});
+document.body.addEventListener('dragleave', (e) => {
+  if (e.target === document.body || e.target === document.getElementById('dropOverlay')) {
+    document.getElementById('dropOverlay').classList.remove('visible');
+  }
+});
+document.body.addEventListener('drop', (e) => {
+  e.preventDefault();
+  document.getElementById('dropOverlay').classList.remove('visible');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImageFile(file);
+});
+
+function buildExport() {
+  const config = { player1: {}, player2: {} };
+  for (const player of [1, 2]) {
+    const key = `player${player}`;
+    for (const [zone, rect] of Object.entries(state.zones[player])) {
+      config[key][zone] = { x: rect.x, y: rect.y, w: rect.w, h: rect.h };
+    }
+  }
+  return JSON.stringify(config, null, 2);
+}
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const json = buildExport();
+  document.getElementById('exportArea').value = json;
+
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'zone_config.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('importBtn').addEventListener('click', () => {
+  document.getElementById('importInput').click();
+});
+
+document.getElementById('importInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const config = JSON.parse(ev.target.result);
+      for (const player of [1, 2]) {
+        const key = `player${player}`;
+        if (config[key]) {
+          state.zones[player] = {};
+          for (const [zone, rect] of Object.entries(config[key])) {
+            state.zones[player][zone] = { ...rect };
+          }
+        }
+      }
+      buildZoneList();
+      draw();
+    } catch (err) {
+      alert('JSONの読み込みに失敗しました: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (!confirm('全ゾーンをクリアしますか？')) return;
+  state.zones = { 1: {}, 2: {} };
+  buildZoneList();
+  draw();
+});
+
+window.addEventListener('resize', () => draw());
+buildZoneList();
+draw();
+</script>
+</body>
+</html>

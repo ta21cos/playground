@@ -1,0 +1,12 @@
+{
+  "cards": [
+    { "index": 0, "name": "ピカチュウex", "count": 2 },
+    { "index": 1, "name": "ライチュウ", "count": 2 },
+    { "index": 2, "name": "ピカチュウ", "count": 4 },
+    { "index": 3, "name": "ボウルタウン", "count": 2 },
+    { "index": 4, "name": "ネストボール", "count": 4 },
+    { "index": 5, "name": "博士の研究", "count": 4 },
+    { "index": 6, "name": "ナンジャモ", "count": 3 },
+    { "index": 7, "name": "基本雷エネルギー", "count": 12 }
+  ]
+}
