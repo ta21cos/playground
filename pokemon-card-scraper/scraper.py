@@ -1,27 +1,34 @@
 #!/usr/bin/env python3
-"""Pokemon Card Scraper — fetches card data from pokemon-card.com and outputs JSONL."""
+"""Pokemon Card Scraper — fetches card data from pokemon-card.com and stores in SQLite."""
 
 import argparse
+import hashlib
 import json
 import random
 import re
+import sqlite3
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
 
 BASE_URL = "https://www.pokemon-card.com/card-search/details.php/card/{card_id}/"
+SEARCH_API_URL = "https://www.pokemon-card.com/card-search/resultAPI.php"
 
 ICON_TO_TYPE = {
     "icon-grass": "草",
     "icon-fire": "炎",
     "icon-water": "水",
+    "icon-electric": "雷",
     "icon-lightning": "雷",
     "icon-psychic": "超",
     "icon-fighting": "闘",
+    "icon-dark": "悪",
     "icon-darkness": "悪",
+    "icon-steel": "鋼",
     "icon-metal": "鋼",
     "icon-dragon": "竜",
     "icon-fairy": "フェアリー",
@@ -33,6 +40,83 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
 }
+
+
+# ---------------------------------------------------------------------------
+# SQLite
+# ---------------------------------------------------------------------------
+
+def init_db(db_path: Path) -> sqlite3.Connection:
+    conn = sqlite3.connect(db_path)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cards (
+            card_id     TEXT PRIMARY KEY,
+            name        TEXT,
+            card_category TEXT,
+            data        TEXT NOT NULL,
+            image_path  TEXT,
+            fetched_at  TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    return conn
+
+
+def get_fetched_ids(conn: sqlite3.Connection) -> set[str]:
+    rows = conn.execute("SELECT card_id FROM cards").fetchall()
+    return {r[0] for r in rows}
+
+
+def save_card(conn: sqlite3.Connection, data: dict, image_path: str | None = None):
+    conn.execute(
+        """
+        INSERT OR REPLACE INTO cards (card_id, name, card_category, data, image_path, fetched_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (
+            data["card_id"],
+            data.get("name", ""),
+            data.get("card_category", ""),
+            json.dumps(data, ensure_ascii=False),
+            image_path or "",
+            datetime.now(timezone.utc).isoformat(),
+        ),
+    )
+    conn.commit()
+
+
+# ---------------------------------------------------------------------------
+# Card ID input
+# ---------------------------------------------------------------------------
+
+def fetch_pack_card_ids(session: requests.Session, pack_id: str) -> list[str]:
+    """Fetch all card IDs belonging to a pack via the search API."""
+    ids = []
+    page = 1
+    while True:
+        params = {
+            "keyword": "",
+            "se_ta": "",
+            "regulation_sidebar_form": "all",
+            "pg": pack_id,
+            "illust": "",
+            "sm_and_keyword": "true",
+            "page": str(page),
+        }
+        resp = session.get(SEARCH_API_URL, params=params, headers=HEADERS, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        for card in data.get("cardList", []):
+            card_id = str(card.get("cardID", ""))
+            if card_id:
+                ids.append(card_id)
+        max_page = data.get("maxPage", 1)
+        print(f"  Pack {pack_id}: page {page}/{max_page}, got {len(data.get('cardList', []))} cards")
+        if page >= max_page:
+            break
+        page += 1
+        time.sleep(random.uniform(1.0, 3.0))
+    return ids
 
 
 def read_card_ids(filepath: str) -> list[str]:
@@ -48,20 +132,9 @@ def read_card_ids(filepath: str) -> list[str]:
     return ids
 
 
-def get_loaded_ids(output_path: Path) -> set[str]:
-    if not output_path.exists():
-        return set()
-    loaded = set()
-    for line in output_path.read_text().strip().splitlines():
-        if not line:
-            continue
-        try:
-            data = json.loads(line)
-            loaded.add(str(data.get("card_id", "")))
-        except json.JSONDecodeError:
-            continue
-    return loaded
-
+# ---------------------------------------------------------------------------
+# HTML parsing
+# ---------------------------------------------------------------------------
 
 def extract_icon_types(element) -> list[str]:
     types = []
@@ -82,29 +155,23 @@ def parse_card(html: str, card_id: str) -> dict:
 
     result = {"card_id": card_id}
 
-    # Card name
     h1 = section.select_one("h1.Heading1")
     result["name"] = h1.get_text(strip=True) if h1 else ""
 
-    # Image URL
     img = section.select_one(".LeftBox img.fit")
     if img and img.get("src"):
         result["image_url"] = "https://www.pokemon-card.com" + img["src"]
     else:
         result["image_url"] = ""
 
-    # Regulation mark
     reg_img = section.select_one(".subtext .img-regulation")
     result["regulation"] = reg_img.get("alt", "") if reg_img else ""
 
-    # Card number & rarity
     subtext = section.select_one(".subtext")
     if subtext:
         raw = subtext.get_text()
         raw = re.sub(r"\s+", " ", raw).strip()
-        # Remove regulation prefix (e.g. "M3") — it's already captured separately
         raw = re.sub(r"^[A-Z][A-Z0-9]*\s*", "", raw).strip()
-        # Extract card number pattern like "002 / 080"
         num_match = re.search(r"(\d+\s*/\s*\d+)", raw)
         result["card_number"] = num_match.group(1).replace(" ", "") if num_match else raw
 
@@ -119,11 +186,9 @@ def parse_card(html: str, card_id: str) -> dict:
         result["card_number"] = ""
         result["rarity"] = ""
 
-    # Illustrator
     author_a = section.select_one(".author a")
     result["illustrator"] = author_a.get_text(strip=True) if author_a else ""
 
-    # Pokemon info (図鑑)
     card_div = section.select_one(".card")
     if card_div:
         card_h4 = card_div.select_one("h4")
@@ -137,7 +202,6 @@ def parse_card(html: str, card_id: str) -> dict:
         result["pokedex_info"] = ""
         result["flavor_text"] = ""
 
-    # Right box — card stats
     right = section.select_one(".RightBox-inner")
     if not right:
         result.update({
@@ -152,11 +216,12 @@ def parse_card(html: str, card_id: str) -> dict:
             "retreat_cost": 0,
             "evolutions": [],
             "effect_text": "",
+            "rule_text": "",
+            "special_rule": "",
         })
-        _add_pack_info(section, result)
+        _add_pack_info(soup, section, result)
         return result
 
-    # Stage & HP & Type
     stage_el = right.select_one(".TopInfo .td-l .type")
     result["stage"] = stage_el.get_text(strip=True) if stage_el else ""
 
@@ -165,43 +230,100 @@ def parse_card(html: str, card_id: str) -> dict:
 
     result["type"] = extract_icon_types(right.select_one(".TopInfo .td-r"))
 
-    # Determine card category and parse accordingly
     h2_tags = right.select("h2")
     h2_texts = [h2.get_text(strip=True) for h2 in h2_tags]
 
     is_pokemon = "ワザ" in h2_texts or result["hp"] is not None
-    trainer_categories = ["グッズ", "サポート", "スタジアム", "ポケモンのどうぐ"]
-    detected_trainer = ""
-    for tc in trainer_categories:
-        if tc in h2_texts:
-            detected_trainer = tc
+    non_pokemon_categories = [
+        "グッズ", "サポート", "スタジアム", "ポケモンのどうぐ",
+        "基本エネルギー", "特殊エネルギー",
+    ]
+    detected_category = ""
+    for cat in non_pokemon_categories:
+        if cat in h2_texts:
+            detected_category = cat
             break
 
-    if detected_trainer and not is_pokemon:
-        result["card_category"] = detected_trainer
-        effect_parts = []
-        for p in right.select("p"):
-            effect_parts.append(p.get_text(strip=True))
-        result["effect_text"] = "\n".join(effect_parts)
-        result["stage"] = ""
-        result["abilities"] = []
-        result["moves"] = []
-        result["weakness"] = ""
-        result["resistance"] = ""
-        result["retreat_cost"] = 0
-        result["evolutions"] = []
+    if detected_category and not is_pokemon:
+        result["card_category"] = detected_category
+        _parse_non_pokemon(right, h2_tags, detected_category, result)
     else:
         result["card_category"] = "ポケモン"
         result["effect_text"] = ""
+        result["rule_text"] = ""
         _parse_pokemon_details(right, result)
 
-    _add_pack_info(section, result)
+    _add_pack_info(soup, section, result)
+    result["canonical_id"] = compute_canonical_id(result)
     return result
+
+
+def _parse_non_pokemon(right, h2_tags, category: str, result: dict):
+    """Parse trainer cards and energy cards."""
+    category_h2 = None
+    special_rule_h2 = None
+    for h2 in h2_tags:
+        text = h2.get_text(strip=True)
+        if text == category:
+            category_h2 = h2
+        elif text == "特別なルール":
+            special_rule_h2 = h2
+
+    effect_parts = []
+    rule_parts = []
+    if category_h2:
+        sibling = category_h2.find_next_sibling()
+        while sibling and sibling.name != "h2":
+            if sibling.name == "p":
+                text = sibling.get_text(strip=True)
+                if text:
+                    if _is_rule_text(text, category):
+                        rule_parts.append(text)
+                    else:
+                        effect_parts.append(text)
+            sibling = sibling.find_next_sibling()
+
+    result["effect_text"] = "\n".join(effect_parts)
+    result["rule_text"] = "\n".join(rule_parts)
+
+    if special_rule_h2:
+        parts = []
+        sibling = special_rule_h2.find_next_sibling()
+        while sibling and sibling.name != "h2":
+            if sibling.name == "p":
+                text = sibling.get_text(strip=True)
+                if text:
+                    parts.append(text)
+            sibling = sibling.find_next_sibling()
+        result["special_rule"] = "\n".join(parts)
+    else:
+        result["special_rule"] = ""
+
+    result["stage"] = ""
+    result["abilities"] = []
+    result["moves"] = []
+    result["weakness"] = ""
+    result["resistance"] = ""
+    result["retreat_cost"] = 0
+    result["evolutions"] = []
+
+
+_RULE_PATTERNS = [
+    "グッズは、自分の番に何枚でも使える。",
+    "サポートは、自分の番に1枚しか使えない。",
+    "スタジアムは、",
+    "ポケモンのどうぐは、",
+]
+
+
+def _is_rule_text(text: str, category: str) -> bool:
+    return any(text.startswith(pat) for pat in _RULE_PATTERNS)
 
 
 def _parse_pokemon_details(right, result: dict):
     abilities = []
     moves = []
+    special_rule_parts = []
 
     h2_tags = right.select("h2")
     for h2 in h2_tags:
@@ -229,17 +351,25 @@ def _parse_pokemon_details(right, result: dict):
                     moves.append(move)
                 sibling = sibling.find_next_sibling()
 
+        elif section_name == "特別なルール":
+            sibling = h2.find_next_sibling()
+            while sibling and sibling.name != "h2":
+                if sibling.name == "p":
+                    text = sibling.get_text(strip=True)
+                    if text:
+                        special_rule_parts.append(text)
+                sibling = sibling.find_next_sibling()
+
     result["abilities"] = abilities
     result["moves"] = moves
+    result["special_rule"] = "\n".join(special_rule_parts)
 
-    # Weakness, Resistance, Retreat
     table = right.select_one("table")
     if table:
         rows = table.select("tr")
         if len(rows) >= 2:
             cells = rows[1].select("td")
             result["weakness"] = cells[0].get_text(strip=True) if len(cells) > 0 else ""
-            # Prepend weakness type
             weakness_types = extract_icon_types(cells[0]) if len(cells) > 0 else []
             if weakness_types:
                 result["weakness"] = weakness_types[0] + result["weakness"]
@@ -259,7 +389,6 @@ def _parse_pokemon_details(right, result: dict):
         result["resistance"] = ""
         result["retreat_cost"] = 0
 
-    # Evolutions
     evolutions = []
     for ev in right.select(".evolution"):
         a = ev.select_one("a")
@@ -291,11 +420,73 @@ def _parse_move(h4_tag) -> dict:
     }
 
 
-def _add_pack_info(section, result: dict):
+def _add_pack_info(soup, section, result: dict):
     packs = []
-    for li in section.select(".SubSection .List_item a"):
-        packs.append(li.get_text(strip=True))
+    pack_links = section.select(".SubSection .List_item a")
+    if not pack_links:
+        pack_links = soup.select("ul.List .List_item a")
+    for a in pack_links:
+        href = a.get("href", "")
+        if href and not href.startswith("http"):
+            href = "https://www.pokemon-card.com" + href
+        name = a.get_text(strip=True)
+        if name:
+            packs.append({"name": name, "url": href})
     result["packs"] = packs
+
+
+def compute_canonical_id(data: dict) -> str:
+    """Compute a stable ID from gameplay-relevant fields.
+
+    Cards with the same canonical_id are functionally identical
+    (different art, rarity, or pack do not affect gameplay).
+    """
+    key_parts = [
+        data.get("name", ""),
+        data.get("card_category", ""),
+        data.get("stage", ""),
+        str(data.get("hp") or ""),
+        json.dumps(data.get("type", []), ensure_ascii=False, sort_keys=True),
+        json.dumps(data.get("abilities", []), ensure_ascii=False, sort_keys=True),
+        json.dumps(data.get("moves", []), ensure_ascii=False, sort_keys=True),
+        data.get("weakness", ""),
+        data.get("resistance", ""),
+        str(data.get("retreat_cost", 0)),
+        data.get("effect_text", ""),
+        data.get("special_rule", ""),
+    ]
+    raw = "|".join(key_parts)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
+# ---------------------------------------------------------------------------
+# Network
+# ---------------------------------------------------------------------------
+
+def download_image(session: requests.Session, image_url: str, dest: Path, max_retries: int = 3) -> bool:
+    if dest.exists():
+        return True
+    for attempt in range(max_retries):
+        try:
+            resp = session.get(image_url, headers=HEADERS, timeout=30)
+            if resp.status_code == 404:
+                print(f"  [SKIP] image 404: {image_url}")
+                return False
+            if resp.status_code == 429 or resp.status_code >= 500:
+                wait = (2 ** attempt) * 5 + random.uniform(0, 3)
+                print(f"  [RETRY] image HTTP {resp.status_code}, waiting {wait:.1f}s...")
+                time.sleep(wait)
+                continue
+            resp.raise_for_status()
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(resp.content)
+            return True
+        except requests.RequestException as e:
+            wait = (2 ** attempt) * 5 + random.uniform(0, 3)
+            print(f"  [RETRY] image {e}, waiting {wait:.1f}s...")
+            time.sleep(wait)
+    print(f"  [FAIL] image download failed: {image_url}")
+    return False
 
 
 def fetch_card(session: requests.Session, card_id: str, max_retries: int = 3) -> dict | None:
@@ -321,24 +512,45 @@ def fetch_card(session: requests.Session, card_id: str, max_retries: int = 3) ->
     return None
 
 
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
 def main():
     parser = argparse.ArgumentParser(description="Pokemon Card Scraper")
-    parser.add_argument("input", help="Path to card ID list (txt: one ID per line, or csv: first column)")
-    parser.add_argument("-o", "--output", default="cards.jsonl", help="Output JSONL file path (default: cards.jsonl)")
-    parser.add_argument("--min-sleep", type=float, default=3.0, help="Min sleep between requests in seconds (default: 3)")
-    parser.add_argument("--max-sleep", type=float, default=8.0, help="Max sleep between requests in seconds (default: 8)")
+    parser.add_argument("--ids", nargs="+", metavar="CARD_ID", help="Card IDs to fetch (directly specify)")
+    parser.add_argument("-f", "--file", help="Path to card ID list file (txt/csv)")
+    parser.add_argument("--pack", nargs="+", metavar="PACK_ID", help="Pack IDs to fetch all cards from (e.g. 870 for Scarlet ex)")
+    parser.add_argument("--db", default="cards.db", help="SQLite database path (default: cards.db)")
+    parser.add_argument("--image-dir", default=None, help="Directory to save card images (omit to skip)")
+    parser.add_argument("--min-sleep", type=float, default=3.0, help="Min sleep between requests (default: 3)")
+    parser.add_argument("--max-sleep", type=float, default=8.0, help="Max sleep between requests (default: 8)")
     args = parser.parse_args()
 
-    card_ids = read_card_ids(args.input)
+    card_ids: list[str] = []
+    if args.ids:
+        card_ids.extend(args.ids)
+    if args.file:
+        card_ids.extend(read_card_ids(args.file))
+    if args.pack:
+        session_for_search = requests.Session()
+        for pack_id in args.pack:
+            print(f"Fetching card IDs for pack {pack_id}...")
+            pack_ids = fetch_pack_card_ids(session_for_search, pack_id)
+            card_ids.extend(pack_ids)
+            print(f"  → {len(pack_ids)} cards found in pack {pack_id}")
     if not card_ids:
-        print("No card IDs found in input file.")
-        sys.exit(1)
+        parser.error("Specify card IDs with --ids, -f/--file, and/or --pack")
 
-    output_path = Path(args.output)
-    already_fetched = get_loaded_ids(output_path)
+    db_path = Path(args.db)
+    image_dir = Path(args.image_dir) if args.image_dir else None
+    conn = init_db(db_path)
+    already_fetched = get_fetched_ids(conn)
     remaining = [cid for cid in card_ids if cid not in already_fetched]
 
     print(f"Total IDs: {len(card_ids)}, Already fetched: {len(already_fetched)}, Remaining: {len(remaining)}")
+    if image_dir:
+        print(f"Image download: ON → {image_dir}")
 
     if not remaining:
         print("All cards already fetched.")
@@ -348,23 +560,28 @@ def main():
     success = 0
     fail = 0
 
-    with open(output_path, "a", encoding="utf-8") as f:
-        for i, card_id in enumerate(remaining):
-            print(f"[{i+1}/{len(remaining)}] Fetching card {card_id}...")
-            data = fetch_card(session, card_id)
+    for i, card_id in enumerate(remaining):
+        print(f"[{i+1}/{len(remaining)}] Fetching card {card_id}...")
+        data = fetch_card(session, card_id)
 
-            if data:
-                f.write(json.dumps(data, ensure_ascii=False) + "\n")
-                f.flush()
-                success += 1
-            else:
-                fail += 1
+        if data:
+            img_path = None
+            if image_dir and data.get("image_url"):
+                ext = Path(data["image_url"]).suffix or ".jpg"
+                image_dest = image_dir / f"{card_id}{ext}"
+                if download_image(session, data["image_url"], image_dest):
+                    img_path = str(image_dest)
+            save_card(conn, data, img_path)
+            success += 1
+        else:
+            fail += 1
 
-            if i < len(remaining) - 1:
-                sleep_time = random.uniform(args.min_sleep, args.max_sleep)
-                time.sleep(sleep_time)
+        if i < len(remaining) - 1:
+            sleep_time = random.uniform(args.min_sleep, args.max_sleep)
+            time.sleep(sleep_time)
 
-    print(f"\nDone! Success: {success}, Failed: {fail}, Output: {args.output}")
+    conn.close()
+    print(f"\nDone! Success: {success}, Failed: {fail}, DB: {args.db}")
 
 
 if __name__ == "__main__":
