@@ -40,7 +40,7 @@ import "./styles/index.css";
 
 const resolver = new CardResolver(cardsData as CardType[]);
 
-type Modal = null | "search" | "benchSelect" | "sideView" | "trashView" | "drawInput";
+type Modal = null | "search" | "benchSelect" | "sideView" | "trashView" | "drawInput" | "deckMenu";
 
 interface AppState {
   game: GameState;
@@ -489,7 +489,7 @@ function App() {
 
         <div className="game-board">
           <div className="board-top">
-            <DroppableZone zoneName="山札" cardCount={game.zones.山札.length} onZoneClick={() => dispatch({ type: "SET_MODAL", modal: "search" })}>
+            <DroppableZone zoneName="山札" cardCount={game.zones.山札.length} onZoneClick={() => dispatch({ type: "SET_MODAL", modal: "deckMenu" })}>
               <div style={{ width: 60, height: 84, background: "#2a4a2a", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
                 {game.zones.山札.length}
               </div>
@@ -553,6 +553,81 @@ function App() {
           position={{ x: contextMenu.x, y: contextMenu.y }}
           onClose={() => dispatch({ type: "SET_CONTEXT_MENU", menu: null })}
         />
+      )}
+
+      {modal === "deckMenu" && (
+        <div className="modal-overlay" onClick={() => dispatch({ type: "SET_MODAL", modal: null })}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>山札 ({game.zones.山札.length}枚)</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "12px" }}>
+              <button
+                className="deck-menu-btn"
+                onClick={() => dispatch({ type: "SET_MODAL", modal: "search" })}
+              >
+                サーチ
+              </button>
+              <button
+                className="deck-menu-btn"
+                onClick={() => dispatch({ type: "SET_MODAL", modal: "drawInput" })}
+              >
+                N枚ドロー
+              </button>
+              <button
+                className="deck-menu-btn"
+                onClick={() => {
+                  dispatch({ type: "SHUFFLE_DECK" });
+                  dispatch({ type: "SET_MODAL", modal: null });
+                }}
+              >
+                シャッフル
+              </button>
+            </div>
+            <button style={{ marginTop: "12px" }} onClick={() => dispatch({ type: "SET_MODAL", modal: null })}>
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
+
+      {modal === "drawInput" && (
+        <div className="modal-overlay" onClick={() => dispatch({ type: "SET_MODAL", modal: null })}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>N枚ドロー</h3>
+            <p style={{ fontSize: "14px", opacity: 0.7, margin: "8px 0" }}>
+              山札残り: {game.zones.山札.length}枚
+            </p>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px" }}>
+              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                <button
+                  key={n}
+                  className="draw-n-btn"
+                  disabled={game.zones.山札.length === 0}
+                  onClick={() => dispatch({ type: "DRAW_N", n })}
+                >
+                  {n}枚
+                </button>
+              ))}
+            </div>
+            <div style={{ marginTop: "12px" }}>
+              <input
+                type="number"
+                min="1"
+                max={game.zones.山札.length}
+                placeholder="枚数を入力"
+                className="draw-n-input"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const val = parseInt((e.target as HTMLInputElement).value, 10);
+                    if (val > 0) dispatch({ type: "DRAW_N", n: val });
+                  }
+                }}
+              />
+            </div>
+            <button style={{ marginTop: "12px" }} onClick={() => dispatch({ type: "SET_MODAL", modal: null })}>
+              キャンセル
+            </button>
+          </div>
+        </div>
       )}
 
       {modal === "search" && (

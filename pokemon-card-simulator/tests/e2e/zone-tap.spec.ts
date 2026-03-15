@@ -2,11 +2,22 @@ import { test, expect } from "@playwright/test";
 import { startGameWithSeed, getZone, getZoneCount, clickCard } from "./helpers";
 
 test.describe("FR-28: ゾーンタップ操作", () => {
-  test("山札タップでサーチメニューが表示される", async ({ page }) => {
+  test("山札タップでメニューが表示される（サーチ / N枚ドロー / シャッフル）", async ({ page }) => {
     await page.goto("/");
     await startGameWithSeed(page);
 
     await getZone(page, "山札").click();
+    await expect(page.getByRole("button", { name: "サーチ" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "N枚ドロー" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "シャッフル" })).toBeVisible();
+  });
+
+  test("山札メニューからサーチを実行する", async ({ page }) => {
+    await page.goto("/");
+    await startGameWithSeed(page);
+
+    await getZone(page, "山札").click();
+    await page.getByRole("button", { name: "サーチ" }).click();
     await expect(page.getByText("山札サーチ")).toBeVisible();
   });
 
@@ -19,6 +30,7 @@ test.describe("FR-28: ゾーンタップ操作", () => {
     );
 
     await getZone(page, "山札").click();
+    await page.getByRole("button", { name: "サーチ" }).click();
     await expect(page.getByText("山札サーチ")).toBeVisible();
 
     await page.locator(".search-card").first().click();
@@ -39,12 +51,57 @@ test.describe("FR-28: ゾーンタップ操作", () => {
     );
 
     await getZone(page, "山札").click();
+    await page.getByRole("button", { name: "サーチ" }).click();
     await page.getByRole("button", { name: "選ばずに終了" }).click();
 
     const handAfter = parseInt(
       (await getZoneCount(page, "手札").textContent()) ?? "0",
     );
     expect(handAfter).toBe(handBefore);
+  });
+
+  test("山札メニューからN枚ドローを実行する", async ({ page }) => {
+    await page.goto("/");
+    await startGameWithSeed(page);
+
+    const handBefore = parseInt(
+      (await getZoneCount(page, "手札").textContent()) ?? "0",
+    );
+    const deckBefore = parseInt(
+      (await getZoneCount(page, "山札").textContent()) ?? "0",
+    );
+
+    await getZone(page, "山札").click();
+    await page.getByRole("button", { name: "N枚ドロー" }).click();
+    await expect(page.getByText("N枚ドロー")).toBeVisible();
+
+    await page.getByRole("button", { name: "3枚" }).click();
+
+    const handAfter = parseInt(
+      (await getZoneCount(page, "手札").textContent()) ?? "0",
+    );
+    const deckAfter = parseInt(
+      (await getZoneCount(page, "山札").textContent()) ?? "0",
+    );
+    expect(handAfter).toBe(handBefore + 3);
+    expect(deckAfter).toBe(deckBefore - 3);
+  });
+
+  test("山札メニューからシャッフルを実行する", async ({ page }) => {
+    await page.goto("/");
+    await startGameWithSeed(page);
+
+    const deckBefore = parseInt(
+      (await getZoneCount(page, "山札").textContent()) ?? "0",
+    );
+
+    await getZone(page, "山札").click();
+    await page.getByRole("button", { name: "シャッフル" }).click();
+
+    const deckAfter = parseInt(
+      (await getZoneCount(page, "山札").textContent()) ?? "0",
+    );
+    expect(deckAfter).toBe(deckBefore);
   });
 
   test("サイドゾーンタップでサイド一覧が表示される", async ({ page }) => {

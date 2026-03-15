@@ -19,6 +19,7 @@ test.describe("NFR-2: モバイルレスポンシブ", () => {
     const page = await context.newPage();
     await page.goto("/");
 
+    await page.getByRole("button", { name: "テキスト入力" }).click();
     await page.getByRole("textbox").fill(`ストライク 4
 クヌギダマ 4
 タネボー 4

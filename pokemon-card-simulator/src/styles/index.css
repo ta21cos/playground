@@ -266,6 +266,52 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.deck-menu-btn {
+  padding: 12px 24px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #2a2a4e;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+}
+
+.deck-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.draw-n-btn {
+  width: 52px;
+  height: 40px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #2a2a4e;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.draw-n-btn:hover {
+  background: rgba(52, 152, 219, 0.3);
+}
+
+.draw-n-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.draw-n-input {
+  width: 120px;
+  background: #2a2a4e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 16px;
+  text-align: center;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

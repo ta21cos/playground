@@ -13,6 +13,10 @@ const TEST_DECK = `ストライク 4
 ミストエネルギー 20`;
 
 export async function importDeck(page: Page, deck = TEST_DECK) {
+  const textTab = page.getByRole("button", { name: "テキスト入力" });
+  if (await textTab.isVisible().catch(() => false)) {
+    await textTab.click();
+  }
   await page.getByRole("textbox").fill(deck);
   await page.getByRole("button", { name: "デッキ読み込み" }).click();
   await expect(page.getByText("デッキ読込完了: 60枚")).toBeVisible();
