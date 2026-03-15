@@ -20,6 +20,7 @@ export function DroppableZone({
     <div
       ref={setNodeRef}
       className={`zone zone-${zoneName} ${isOver ? "zone-over" : ""}`}
+      data-zone={zoneName}
       onClick={onZoneClick}
     >
       <div className="zone-header">
