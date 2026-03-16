@@ -44,7 +44,10 @@ const sessionStateCache = new Map<string, CachedSessionState>();
 
 let lastSessions: ClaudeSession[] = [];
 
-const previousStatusMap = new Map<string, { status: ClaudeSession["status"]; doneAt: number | null }>();
+const previousStatusMap = new Map<
+  string,
+  { status: ClaudeSession["status"]; doneAt: number | null }
+>();
 const DONE_TTL = 5 * 60 * 1000;
 
 function getClaudeDir(): string {
@@ -63,8 +66,13 @@ function dbg(msg: string) {
 function flushDebug() {
   if (debugLog.length === 0) return;
   try {
-    fs.appendFileSync(path.join(os.homedir(), ".claude", "raycast-debug.log"), debugLog.join("\n") + "\n");
-  } catch { /* ignore */ }
+    fs.appendFileSync(
+      path.join(os.homedir(), ".claude", "raycast-debug.log"),
+      debugLog.join("\n") + "\n",
+    );
+  } catch {
+    /* ignore */
+  }
   debugLog.length = 0;
 }
 
@@ -94,14 +102,18 @@ function batchGetCwds(pids: number[]): Map<number, string> {
 
 function getRunningClaudeProcesses(): ClaudeProcessResult {
   const now = Date.now();
-  if (processCache.data && now - processCache.ts < PROCESS_TTL) return processCache.data;
+  if (processCache.data && now - processCache.ts < PROCESS_TTL)
+    return processCache.data;
 
   const bySessionId = new Map<string, ProcessInfo>();
   const byCwd = new Map<string, ProcessInfo>();
   const unmatchedPids: { pid: number; cpu: number; tty: string | null }[] = [];
 
   try {
-    const output = execSync("/bin/ps -eo pid,%cpu,tty,args", { encoding: "utf-8", timeout: 5000 });
+    const output = execSync("/bin/ps -eo pid,%cpu,tty,args", {
+      encoding: "utf-8",
+      timeout: 5000,
+    });
     for (const line of output.split("\n")) {
       if (!line.includes("/.local/bin/claude")) continue;
       const match = line.trim().match(/^(\d+)\s+([\d.]+)\s+(\S+)\s+(.+)$/);
@@ -124,7 +136,9 @@ function getRunningClaudeProcesses(): ClaudeProcessResult {
   }
 
   dbg(`bySessionId: ${JSON.stringify([...bySessionId.keys()])}`);
-  dbg(`unmatchedPids: ${JSON.stringify(unmatchedPids.map(p => ({ pid: p.pid, tty: p.tty })))}`);
+  dbg(
+    `unmatchedPids: ${JSON.stringify(unmatchedPids.map((p) => ({ pid: p.pid, tty: p.tty })))}`,
+  );
 
   const cwdMap = batchGetCwds(unmatchedPids.map((p) => p.pid));
   for (const { pid, cpu, tty } of unmatchedPids) {
@@ -233,10 +247,13 @@ function getGitBranch(projectDir: string): string | null {
     }
   } catch {
     try {
-      const output = execSync(`git -C "${projectDir}" rev-parse --abbrev-ref HEAD`, {
-        encoding: "utf-8",
-        timeout: 3000,
-      }).trim();
+      const output = execSync(
+        `git -C "${projectDir}" rev-parse --abbrev-ref HEAD`,
+        {
+          encoding: "utf-8",
+          timeout: 3000,
+        },
+      ).trim();
       if (output && output !== "HEAD") branch = output;
     } catch {
       // not a git repo
@@ -251,7 +268,7 @@ function readLastLines(filePath: string, maxLines: number): string[] {
   try {
     const fd = fs.openSync(filePath, "r");
     const stat = fs.fstatSync(fd);
-    const readSize = Math.min(stat.size, 16 * 1024);
+    const readSize = Math.min(stat.size, 128 * 1024);
     const buf = Buffer.alloc(readSize);
     fs.readSync(fd, buf, 0, readSize, stat.size - readSize);
     fs.closeSync(fd);
@@ -268,6 +285,7 @@ interface SessionState {
   preview: string | null;
   activeSubagents: number;
   endsWithLastPrompt: boolean;
+  hasSignificantEntry: boolean;
 }
 
 function analyzeSessionState(jsonlPath: string, mtimeMs: number): SessionState {
@@ -291,7 +309,8 @@ function analyzeSessionState(jsonlPath: string, mtimeMs: number): SessionState {
       lastEntryType = msgType;
 
       if (msgType === "progress") {
-        if (line.includes("agent_progress")) activeSubagents = Math.max(activeSubagents, 1);
+        if (line.includes("agent_progress"))
+          activeSubagents = Math.max(activeSubagents, 1);
         continue;
       }
 
@@ -302,7 +321,8 @@ function analyzeSessionState(jsonlPath: string, mtimeMs: number): SessionState {
           lastStopReason = inner.stop_reason ?? null;
           if (Array.isArray(inner.content)) {
             for (const block of inner.content) {
-              if (block.type === "tool_use" && block.name === "Agent") hasAgentToolUse = true;
+              if (block.type === "tool_use" && block.name === "Agent")
+                hasAgentToolUse = true;
               if (block.type === "text" && block.text) {
                 const trimmed = block.text.slice(0, 100);
                 if (trimmed) preview = trimmed;
@@ -349,7 +369,15 @@ function analyzeSessionState(jsonlPath: string, mtimeMs: number): SessionState {
   }
 
   const endsWithLastPrompt = lastEntryType === "last-prompt";
-  const state = { status, model, preview, activeSubagents, endsWithLastPrompt };
+  const hasSignificantEntry = lastSignificantType !== null;
+  const state = {
+    status,
+    model,
+    preview,
+    activeSubagents,
+    endsWithLastPrompt,
+    hasSignificantEntry,
+  };
   sessionStateCache.set(jsonlPath, { state, mtimeMs });
   return state;
 }
@@ -361,9 +389,13 @@ export function collectSessions(): ClaudeSession[] {
 
   const { bySessionId, byCwd } = getRunningClaudeProcesses();
 
-  let tokenCache: Record<string, { totalTokens?: number; startTime?: number }> = {};
+  let tokenCache: Record<string, { totalTokens?: number; startTime?: number }> =
+    {};
   try {
-    const raw = fs.readFileSync(path.join(claudeDir, "token-usage-cache.json"), "utf-8");
+    const raw = fs.readFileSync(
+      path.join(claudeDir, "token-usage-cache.json"),
+      "utf-8",
+    );
     tokenCache = JSON.parse(raw);
   } catch {
     // ignore
@@ -374,12 +406,33 @@ export function collectSessions(): ClaudeSession[] {
 
   let projDirs: string[];
   try {
-    projDirs = fs.readdirSync(projectsDir, { withFileTypes: true })
+    projDirs = fs
+      .readdirSync(projectsDir, { withFileTypes: true })
       .filter((d) => d.isDirectory())
       .map((d) => d.name);
   } catch {
     return lastSessions;
   }
+
+  const activeProjDirNames = new Set<string>();
+  byCwd.forEach((_, cwd) => {
+    const cwdEncoded = cwd.replace(/[/.]/g, "-");
+    for (const name of projDirs) {
+      if (name === cwdEncoded || cwdEncoded.startsWith(name)) {
+        activeProjDirNames.add(name);
+      }
+    }
+  });
+  bySessionId.forEach((_, sessionId) => {
+    for (const name of projDirs) {
+      try {
+        fs.accessSync(path.join(projectsDir, name, `${sessionId}.jsonl`));
+        activeProjDirNames.add(name);
+      } catch {
+        /* not in this dir */
+      }
+    }
+  });
 
   for (const projDirName of projDirs) {
     const projPath = path.join(projectsDir, projDirName);
@@ -390,7 +443,11 @@ export function collectSessions(): ClaudeSession[] {
     } catch {
       continue;
     }
-    if (now - projStat.mtimeMs / 1000 > 86400) continue;
+    if (
+      !activeProjDirNames.has(projDirName) &&
+      now - projStat.mtimeMs / 1000 > 86400
+    )
+      continue;
 
     const resolvedPath = resolveProjectPath(projDirName);
     const shortName = shortProjectName(resolvedPath);
@@ -411,7 +468,10 @@ export function collectSessions(): ClaudeSession[] {
         return;
       }
       const cwdEncoded = cwd.replace(/[/.]/g, "-");
-      if (projDirName === cwdEncoded || cwdEncoded.startsWith(projDirName + "-")) {
+      if (
+        projDirName === cwdEncoded ||
+        cwdEncoded.startsWith(projDirName + "-")
+      ) {
         cwdProcForProject = proc;
       }
     });
@@ -427,7 +487,12 @@ export function collectSessions(): ClaudeSession[] {
     }[] = [];
 
     for (const entry of entries) {
-      if (!entry.isFile() || !entry.name.endsWith(".jsonl") || entry.name.startsWith(".")) continue;
+      if (
+        !entry.isFile() ||
+        !entry.name.endsWith(".jsonl") ||
+        entry.name.startsWith(".")
+      )
+        continue;
 
       const filePath = path.join(projPath, entry.name);
       const sessionId = entry.name.replace(".jsonl", "");
@@ -442,7 +507,12 @@ export function collectSessions(): ClaudeSession[] {
       const mtime = fileStat.mtimeMs / 1000;
       if (now - mtime > 86400) continue;
 
-      projSessions.push({ filePath, sessionId, mtime, mtimeMs: fileStat.mtimeMs });
+      projSessions.push({
+        filePath,
+        sessionId,
+        mtime,
+        mtimeMs: fileStat.mtimeMs,
+      });
 
       if (mtime > newestMtime) {
         newestMtime = mtime;
@@ -469,15 +539,27 @@ export function collectSessions(): ClaudeSession[] {
         pid = procInfo.pid;
         cpuUsage = procInfo.cpu;
         tty = procInfo.tty;
-        if (status === "Idle") status = "Done";
-        else if (cpuUsage > 1.0 && status !== "Running") status = "Running";
+        if (!state.hasSignificantEntry) {
+          status = "Running";
+        } else if (status === "Idle") {
+          status = "Done";
+        } else if (cpuUsage > 1.0 && status !== "Running") {
+          status = "Running";
+        }
       } else {
-        const wasActive = prev && (prev.status === "Running" || prev.status === "WaitingSubagent");
-        const turnCompleted = state.endsWithLastPrompt || state.status === "Idle";
+        const wasActive =
+          prev &&
+          (prev.status === "Running" || prev.status === "WaitingSubagent");
+        const turnCompleted =
+          state.endsWithLastPrompt || state.status === "Idle";
 
         if (wasActive && turnCompleted) {
           status = "Done";
-        } else if (prev?.status === "Done" && prev.doneAt && (Date.now() - prev.doneAt < DONE_TTL)) {
+        } else if (
+          prev?.status === "Done" &&
+          prev.doneAt &&
+          Date.now() - prev.doneAt < DONE_TTL
+        ) {
           status = "Done";
         } else {
           status = status !== "Idle" ? "Dead" : "Idle";
@@ -509,13 +591,13 @@ export function collectSessions(): ClaudeSession[] {
   const now2 = Date.now();
   for (const s of sessions) {
     const prev = previousStatusMap.get(s.sessionId);
-    const doneAt = s.status === "Done"
-      ? (prev?.doneAt ?? now2)
-      : null;
+    const doneAt = s.status === "Done" ? (prev?.doneAt ?? now2) : null;
     previousStatusMap.set(s.sessionId, { status: s.status, doneAt });
   }
 
-  dbg(`collectSessions result (${sessions.length}): ${JSON.stringify(sessions.map(s => ({ sid: s.sessionId.slice(0,8), tty: s.tty, pid: s.pid, status: s.status, shortName: s.shortName })))}`);
+  dbg(
+    `collectSessions result (${sessions.length}): ${JSON.stringify(sessions.map((s) => ({ sid: s.sessionId.slice(0, 8), tty: s.tty, pid: s.pid, status: s.status, shortName: s.shortName })))}`,
+  );
   flushDebug();
 
   lastSessions = sessions;
