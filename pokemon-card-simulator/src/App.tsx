@@ -488,45 +488,51 @@ function App() {
         />
 
         <div className="game-board">
-          <div className="board-top">
-            <DroppableZone zoneName="山札" cardCount={game.zones.山札.length} onZoneClick={() => dispatch({ type: "SET_MODAL", modal: "deckMenu" })}>
-              <div style={{ width: 60, height: 84, background: "#2a4a2a", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                {game.zones.山札.length}
-              </div>
-            </DroppableZone>
+          <div className="area-side">
             <DroppableZone zoneName="サイド" cardCount={game.zones.サイド.length} onZoneClick={() => dispatch({ type: "SET_MODAL", modal: "sideView" })}>
-              <div style={{ width: 60, height: 84, background: "#4a2a2a", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                {game.zones.サイド.length}
-              </div>
-            </DroppableZone>
-            <DroppableZone zoneName="トラッシュ" cardCount={game.zones.トラッシュ.length} onZoneClick={() => dispatch({ type: "SET_MODAL", modal: "trashView" })}>
-              <div style={{ width: 60, height: 84, background: "#3a3a3a", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                {game.zones.トラッシュ.length}
+              <div className="side-stack">
+                {Array.from({ length: game.zones.サイド.length }, (_, i) => (
+                  <div key={i} className="side-card-placeholder" />
+                ))}
               </div>
             </DroppableZone>
           </div>
 
-          <div className="board-center">
-            <DroppableZone zoneName="バトル場" cardCount={game.zones.バトル場.length}>
-              {renderCards("バトル場")}
-            </DroppableZone>
-            <DroppableZone zoneName="スタジアム" cardCount={game.zones.スタジアム.length}>
-              {renderCards("スタジアム")}
-            </DroppableZone>
-          </div>
-
-          <div className="board-bench">
-            <DroppableZone zoneName="ベンチ" cardCount={game.zones.ベンチ.length}>
-              {renderCards("ベンチ")}
-            </DroppableZone>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4, justifyContent: "center" }}>
-              <button onClick={() => dispatch({ type: "BENCH_SIZE", size: game.benchMaxSize + 1 })} style={{ padding: "4px 8px", background: "#2a2a4e", color: "white", border: "1px solid #444", borderRadius: 4, cursor: "pointer" }}>+</button>
-              <span style={{ textAlign: "center", fontSize: 12 }}>{game.benchMaxSize}</span>
-              <button onClick={() => dispatch({ type: "BENCH_SIZE", size: game.benchMaxSize - 1 })} style={{ padding: "4px 8px", background: "#2a2a4e", color: "white", border: "1px solid #444", borderRadius: 4, cursor: "pointer" }}>-</button>
+          <div className="area-field">
+            <div className="field-top">
+              <DroppableZone zoneName="スタジアム" cardCount={game.zones.スタジアム.length}>
+                {renderCards("スタジアム")}
+              </DroppableZone>
+              <DroppableZone zoneName="バトル場" cardCount={game.zones.バトル場.length}>
+                {renderCards("バトル場")}
+              </DroppableZone>
+            </div>
+            <div className="field-bench">
+              <DroppableZone zoneName="ベンチ" cardCount={game.zones.ベンチ.length}>
+                {renderCards("ベンチ")}
+              </DroppableZone>
+              <div className="bench-controls">
+                <button className="bench-btn" onClick={() => dispatch({ type: "BENCH_SIZE", size: game.benchMaxSize + 1 })}>+</button>
+                <span className="bench-size">{game.benchMaxSize}</span>
+                <button className="bench-btn" onClick={() => dispatch({ type: "BENCH_SIZE", size: game.benchMaxSize - 1 })}>-</button>
+              </div>
             </div>
           </div>
 
-          <div className="board-bottom">
+          <div className="area-deck-trash">
+            <DroppableZone zoneName="山札" cardCount={game.zones.山札.length} onZoneClick={() => dispatch({ type: "SET_MODAL", modal: "deckMenu" })}>
+              <div className="deck-stack">
+                <span className="deck-count">{game.zones.山札.length}</span>
+              </div>
+            </DroppableZone>
+            <DroppableZone zoneName="トラッシュ" cardCount={game.zones.トラッシュ.length} onZoneClick={() => dispatch({ type: "SET_MODAL", modal: "trashView" })}>
+              <div className="trash-stack">
+                <span className="trash-count">{game.zones.トラッシュ.length}</span>
+              </div>
+            </DroppableZone>
+          </div>
+
+          <div className="area-hand">
             <DroppableZone zoneName="手札" cardCount={game.zones.手札.length}>
               {renderCards("手札")}
             </DroppableZone>

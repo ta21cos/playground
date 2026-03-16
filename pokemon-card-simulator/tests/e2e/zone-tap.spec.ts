@@ -199,7 +199,7 @@ test.describe("FR-28: ゾーンタップ操作", () => {
     await page.goto("/");
     await startGameWithSeed(page);
 
-    const benchArea = page.locator(".board-bench");
+    const benchArea = page.locator(".field-bench");
     await expect(benchArea.locator("span").filter({ hasText: /^5$/ })).toBeVisible();
 
     await benchArea.getByRole("button", { name: "+" }).click();
