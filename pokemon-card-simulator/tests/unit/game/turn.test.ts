@@ -100,3 +100,50 @@ describe("FR-10: ターン終了", () => {
     expect(result.turnNumber).toBe(turnBefore + 1);
   });
 });
+
+describe("@edge-case FR-7: ゲーム進行中に再度ゲーム開始", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("ゲーム進行中に再度 startGame を呼び出しても状態が変化しない", () => {
+    const game = prepareGameInProgress();
+    game.turnNumber = 3;
+    const sidesBefore = game.zones.サイド.length;
+    const deckBefore = game.zones.山札.length;
+
+    const result = startGame(game);
+    expect(result.turnNumber).toBe(3);
+    expect(result.zones.サイド).toHaveLength(sidesBefore);
+    expect(result.zones.山札).toHaveLength(deckBefore);
+    expect(result.phase).toBe("進行中");
+  });
+});
+
+describe("@edge-case FR-9: ターン数が 100 以上", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("ターン数が 99 のときにターン終了するとターン数が 100 になる", () => {
+    const game = prepareGameInProgress();
+    game.turnNumber = 99;
+    const result = endTurn(game);
+    expect(result.turnNumber).toBe(100);
+  });
+});
+
+describe("@edge-case FR-27: ターン終了ボタン連続押し", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("ターン終了を連続 3 回実行するとターンが 3 進み山札から 3 枚ドローされる", () => {
+    const game = prepareGameInProgress();
+    game.turnNumber = 1;
+    const deckBefore = game.zones.山札.length;
+    const handBefore = game.zones.手札.length;
+
+    let current: GameState = game;
+    for (let i = 0; i < 3; i++) {
+      current = endTurn(current);
+    }
+    expect(current.turnNumber).toBe(4);
+    expect(current.zones.山札).toHaveLength(deckBefore - 3);
+    expect(current.zones.手札).toHaveLength(handBefore + 3);
+  });
+});

@@ -91,3 +91,83 @@ describe("FR-30: ポケモン移動時の付与カード自動トラッシュ", 
     expect(result.zones.トラッシュ).toContain(energy.instanceId);
   });
 });
+
+describe("@edge-case FR-34: 3段階進化スタックのトラッシュ", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("3段階進化のポケモンをトラッシュに送ると進化元すべてとエネルギーがすべてトラッシュへ", () => {
+    const state = createInitialGameState();
+    const merep = createCardInstance(createPokemonCard({ name: "メリープ" }));
+    const mokoko = createCardInstance(createPokemonCard({ name: "モココ", stage: "1進化" }));
+    const denryu = createCardInstance(createPokemonCard({ name: "デンリュウ", stage: "2進化" }));
+    const e1 = createCardInstance({
+      card_id: "e1", name: "基本雷エネルギー", card_category: "基本エネルギー",
+      image_url: "", regulation: "", card_number: "", rarity: "", canonical_id: "e1", type: "雷",
+    } as import("../../../src/types/card").BasicEnergyCard);
+    const e2 = createCardInstance({
+      card_id: "e2", name: "基本雷エネルギー", card_category: "基本エネルギー",
+      image_url: "", regulation: "", card_number: "", rarity: "", canonical_id: "e2", type: "雷",
+    } as import("../../../src/types/card").BasicEnergyCard);
+
+    state.cardInstances[merep.instanceId] = merep;
+    state.cardInstances[mokoko.instanceId] = mokoko;
+    state.cardInstances[denryu.instanceId] = denryu;
+    state.cardInstances[e1.instanceId] = e1;
+    state.cardInstances[e2.instanceId] = e2;
+    state.zones.バトル場 = [merep.instanceId];
+    state.zones.手札 = [mokoko.instanceId, denryu.instanceId];
+
+    let result = evolve(state, mokoko.instanceId, merep.instanceId);
+    result = evolve(result, denryu.instanceId, mokoko.instanceId);
+    result.cardInstances[denryu.instanceId]!.attachedEnergies = [e1.instanceId, e2.instanceId];
+
+    result = moveCardWithCleanup(result, denryu.instanceId, "バトル場", "トラッシュ");
+    expect(result.zones.トラッシュ).toContain(denryu.instanceId);
+    expect(result.zones.トラッシュ).toContain(mokoko.instanceId);
+    expect(result.zones.トラッシュ).toContain(merep.instanceId);
+    expect(result.zones.トラッシュ).toContain(e1.instanceId);
+    expect(result.zones.トラッシュ).toContain(e2.instanceId);
+  });
+});
+
+describe("@edge-case FR-30: 付与カードのエッジケース", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  function makeEnergy() {
+    return createCardInstance({
+      card_id: "e", name: "基本雷エネルギー", card_category: "基本エネルギー",
+      image_url: "", regulation: "", card_number: "", rarity: "", canonical_id: "e", type: "雷",
+    } as import("../../../src/types/card").BasicEnergyCard);
+  }
+
+  it("エネルギーを 10 枚付けたポケモンをトラッシュに送ると全エネルギーが一括トラッシュ", () => {
+    const state = createInitialGameState();
+    const pokemon = createCardInstance(createPokemonCard({ name: "ピカチュウex" }));
+    state.cardInstances[pokemon.instanceId] = pokemon;
+
+    const energyIds: string[] = [];
+    for (let i = 0; i < 10; i++) {
+      const e = makeEnergy();
+      state.cardInstances[e.instanceId] = e;
+      energyIds.push(e.instanceId);
+    }
+    pokemon.attachedEnergies = energyIds;
+    state.zones.バトル場 = [pokemon.instanceId];
+
+    const result = moveCardWithCleanup(state, pokemon.instanceId, "バトル場", "トラッシュ");
+    for (const eId of energyIds) {
+      expect(result.zones.トラッシュ).toContain(eId);
+    }
+    expect(result.cardInstances[pokemon.instanceId]!.attachedEnergies).toHaveLength(0);
+  });
+
+  it("付与カードなしのポケモンを移動してもトラッシュへの余分なカードが発生しない", () => {
+    const state = createInitialGameState();
+    const pokemon = createCardInstance(createPokemonCard({ name: "ピカチュウex" }));
+    state.cardInstances[pokemon.instanceId] = pokemon;
+    state.zones.バトル場 = [pokemon.instanceId];
+
+    const result = moveCardWithCleanup(state, pokemon.instanceId, "バトル場", "トラッシュ");
+    expect(result.zones.トラッシュ).toEqual([pokemon.instanceId]);
+  });
+});

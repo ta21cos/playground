@@ -37,3 +37,22 @@ describe("FR-13: 山札サーチ", () => {
     expect(result.zones.山札).toHaveLength(0);
   });
 });
+
+describe("@edge-case FR-13: サーチのエッジケース", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("山札の全カードを選択して手札に加えると山札は 0 枚になる", () => {
+    const { state } = createDeckWith60Cards();
+    const game = setupGame(state);
+    game.zones.山札 = game.zones.山札.slice(0, 3);
+    const allDeckIds = [...game.zones.山札];
+    const handBefore = game.zones.手札.length;
+
+    const result = searchDeck(game, allDeckIds);
+    expect(result.zones.山札).toHaveLength(0);
+    expect(result.zones.手札).toHaveLength(handBefore + 3);
+    for (const id of allDeckIds) {
+      expect(result.zones.手札).toContain(id);
+    }
+  });
+});

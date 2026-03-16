@@ -59,3 +59,56 @@ describe("FR-33: カスタムセットアップ", () => {
     expect(result.opponentSideCount).toBe(3);
   });
 });
+
+describe("@edge-case FR-33: カスタムセットアップのエッジケース", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("手札に 55 枚配置するとサイド 6 枚分不足のため拒否される", () => {
+    const { state, cards } = createDeckWith60Cards(60);
+    const hand = cards.slice(0, 55);
+    expect(() =>
+      customSetup(state, { hand, battleField: null, bench: [] }),
+    ).toThrow("サイド6枚分のカードが不足しています");
+  });
+
+  it("ベンチの最大枠数を超えて配置しようとすると拒否される", () => {
+    const { state, cards } = createDeckWith60Cards(10);
+    const bench = cards.slice(0, 6);
+    expect(() =>
+      customSetup(state, { hand: [], battleField: null, bench }, 5),
+    ).toThrow("ベンチの最大枠数");
+  });
+
+  it("opponentSideCount に -1 を設定すると拒否される", () => {
+    const { state } = createDeckWith60Cards(10);
+    expect(() =>
+      customSetup(state, {
+        hand: [],
+        battleField: null,
+        bench: [],
+        opponentSideCount: -1,
+      }),
+    ).toThrow("相手サイドカウンター");
+  });
+
+  it("opponentSideCount に 7 を設定すると拒否される", () => {
+    const { state } = createDeckWith60Cards(10);
+    expect(() =>
+      customSetup(state, {
+        hand: [],
+        battleField: null,
+        bench: [],
+        opponentSideCount: 7,
+      }),
+    ).toThrow("相手サイドカウンター");
+  });
+
+  it("山札が 0 枚になった場合のターン 1 ドローはスキップされる", () => {
+    const { state, cards } = createDeckWith60Cards(54);
+    const hand = cards.slice(0, 54);
+    const result = customSetup(state, { hand, battleField: null, bench: [] });
+    expect(result.zones.サイド).toHaveLength(6);
+    expect(result.zones.山札).toHaveLength(0);
+    expect(result.zones.手札).toHaveLength(54);
+  });
+});

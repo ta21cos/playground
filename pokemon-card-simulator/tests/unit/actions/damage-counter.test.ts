@@ -44,3 +44,38 @@ describe("FR-25: ダメカン管理", () => {
     expect(result.cardInstances[pokemonId]!.damageCounters).toBe(0);
   });
 });
+
+describe("@edge-case FR-25: ダメカン管理のエッジケース", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  function makeState() {
+    const state = createInitialGameState();
+    const pokemon = createCardInstance(createPokemonCard({ name: "ピカチュウex" }));
+    state.cardInstances[pokemon.instanceId] = pokemon;
+    state.zones.バトル場 = [pokemon.instanceId];
+    return { state, pokemonId: pokemon.instanceId };
+  }
+
+  it("ダメカンが 0 のポケモンに -10 を 3 回連打しても 0 のまま", () => {
+    const { state, pokemonId } = makeState();
+    let current = state;
+    for (let i = 0; i < 3; i++) {
+      current = addDamage(current, pokemonId, -10);
+    }
+    expect(current.cardInstances[pokemonId]!.damageCounters).toBe(0);
+  });
+
+  it("ダメカン値入力に負の数を入力した場合は 0 になる", () => {
+    const { state, pokemonId } = makeState();
+    state.cardInstances[pokemonId]!.damageCounters = 20;
+    const result = setDamage(state, pokemonId, -50);
+    expect(result.cardInstances[pokemonId]!.damageCounters).toBe(0);
+  });
+
+  it("ダメカン値入力に NaN を渡した場合は 0 になる", () => {
+    const { state, pokemonId } = makeState();
+    state.cardInstances[pokemonId]!.damageCounters = 20;
+    const result = setDamage(state, pokemonId, NaN);
+    expect(result.cardInstances[pokemonId]!.damageCounters).toBe(0);
+  });
+});

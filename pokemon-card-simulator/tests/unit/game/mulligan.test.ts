@@ -43,3 +43,19 @@ describe("FR-6: マリガン処理", () => {
     }
   });
 });
+
+describe("@edge-case FR-6: たねポケモンなしの連続マリガン", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("たねポケモンが1枚もないデッキではマリガンを繰り返しても常にマリガン判定になる", () => {
+    const { state } = createDeckWithoutSeeds();
+    let current = setupGame(state);
+
+    for (let i = 0; i < 5; i++) {
+      expect(needsMulligan(current)).toBe(true);
+      current = executeMulligan(current);
+      expect(current.zones.手札).toHaveLength(7);
+      expect(current.zones.山札).toHaveLength(53);
+    }
+  });
+});

@@ -36,3 +36,27 @@ describe("FR-14: N枚ドロー", () => {
     expect(() => drawCards(game, 0)).toThrow();
   });
 });
+
+describe("@edge-case FR-14: N枚ドローのエッジケース", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("0枚ドローは拒否される", () => {
+    const { state } = createDeckWith60Cards();
+    const game = setupGame(state);
+    const handBefore = game.zones.手札.length;
+    const deckBefore = game.zones.山札.length;
+    expect(() => drawCards(game, 0)).toThrow();
+    expect(game.zones.手札).toHaveLength(handBefore);
+    expect(game.zones.山札).toHaveLength(deckBefore);
+  });
+
+  it("負の数のドローは拒否される", () => {
+    const { state } = createDeckWith60Cards();
+    const game = setupGame(state);
+    const handBefore = game.zones.手札.length;
+    const deckBefore = game.zones.山札.length;
+    expect(() => drawCards(game, -3)).toThrow();
+    expect(game.zones.手札).toHaveLength(handBefore);
+    expect(game.zones.山札).toHaveLength(deckBefore);
+  });
+});

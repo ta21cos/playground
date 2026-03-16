@@ -52,3 +52,13 @@ describe("FR-2: JSON デッキ保存・読み込み", () => {
     }
   });
 });
+
+describe("@edge-case FR-2: デシリアライズのエッジケース", () => {
+  it("不正な JSON 文字列をデシリアライズしようとするとパースエラーが発生する", () => {
+    expect(() => deserializeDeck("{invalid json}", resolver)).toThrow();
+  });
+
+  it("entries フィールドが存在しない JSON をデシリアライズしようとするとエラーが発生する", () => {
+    expect(() => deserializeDeck('{"version":1}', resolver)).toThrow();
+  });
+});

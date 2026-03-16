@@ -27,11 +27,13 @@ export function setDamage(
   const instance = state.cardInstances[instanceId];
   if (!instance) return state;
 
+  const sanitized = Number.isFinite(value) ? value : 0;
+
   return {
     ...state,
     cardInstances: {
       ...state.cardInstances,
-      [instanceId]: { ...instance, damageCounters: Math.max(0, value) },
+      [instanceId]: { ...instance, damageCounters: Math.max(0, sanitized) },
     },
   };
 }

@@ -19,3 +19,17 @@ describe("デッキコードパーサー", () => {
     expect(isValidDeckCode("  xYcD8c-E3GkJG-8Jcccx  ")).toBe(true);
   });
 });
+
+describe("@edge-case FR-1: デッキコードフォーマット不正", () => {
+  it("末尾にハイフンが付いた不正形式は拒否する", () => {
+    expect(isValidDeckCode("XXXXXX-YYYYYY-")).toBe(false);
+  });
+
+  it("セグメント数が2つしかない形式は拒否する", () => {
+    expect(isValidDeckCode("XXXXXX-YYYYYY")).toBe(false);
+  });
+
+  it("セグメントの長さが合わない形式は拒否する", () => {
+    expect(isValidDeckCode("XXXXX-YYYYYY-ZZZZZZ")).toBe(false);
+  });
+});

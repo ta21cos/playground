@@ -46,3 +46,15 @@ describe("FR-16: サイド確認・取得", () => {
     expect(result.zones.手札.length).toBe(game.zones.手札.length + 1);
   });
 });
+
+describe("@edge-case FR-16: サイド取得のエッジケース", () => {
+  it("サイドが 0 枚のときにランダム取得を実行しても状態が変化しない", () => {
+    const game = makeGameInProgress();
+    game.zones.サイド = [];
+    const handBefore = game.zones.手札.length;
+
+    const result = takeSideRandom(game);
+    expect(result.zones.サイド).toHaveLength(0);
+    expect(result.zones.手札).toHaveLength(handBefore);
+  });
+});

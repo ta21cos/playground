@@ -29,3 +29,21 @@ describe("FR-3: デッキバリデーション", () => {
     expect(result.error).toContain("60枚");
   });
 });
+
+describe("@edge-case FR-3: デッキバリデーションのエッジケース", () => {
+  it("基本エネルギーのみ 60 枚のデッキでもバリデーションは成功する", () => {
+    const energyCards: Card[] = Array.from({ length: 60 }, (_, i) => ({
+      card_id: `energy-${i}`,
+      name: "基本雷エネルギー",
+      card_category: "基本エネルギー" as const,
+      image_url: "",
+      regulation: "",
+      card_number: "",
+      rarity: "",
+      canonical_id: `energy-${i}`,
+      type: "雷" as const,
+    }));
+    const result = validateDeck(energyCards);
+    expect(result.valid).toBe(true);
+  });
+});

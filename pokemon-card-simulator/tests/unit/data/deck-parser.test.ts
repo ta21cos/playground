@@ -51,3 +51,35 @@ describe("FR-1: テキスト形式デッキ読み込み", () => {
     expect(result.totalCount).toBe(60);
   });
 });
+
+describe("@edge-case FR-1: デッキ入力のエッジケース", () => {
+  it("カード行の枚数が 0 の場合はスキップされる", () => {
+    const text = `ピカチュウex 0
+ミストエネルギー 60`;
+
+    const result = parseDeckList(text, resolver);
+    const pikachu = result.entries.find((e) => e.card.name === "ピカチュウex");
+    expect(pikachu).toBeUndefined();
+    expect(result.totalCount).toBe(60);
+  });
+
+  it("同一カード名が複数行に分かれて記載されている場合は合算される", () => {
+    const text = `ピカチュウex 2
+ハンドトリマー 4
+ピカチュウex 2
+ミストエネルギー 52`;
+
+    const result = parseDeckList(text, resolver);
+    const pikachu = result.entries.find((e) => e.card.name === "ピカチュウex");
+    expect(pikachu).toBeDefined();
+    expect(pikachu!.count).toBe(4);
+    expect(result.totalCount).toBe(60);
+    expect(result.entries.filter((e) => e.card.name === "ピカチュウex")).toHaveLength(1);
+  });
+
+  it("入力テキストが完全に空文字の場合", () => {
+    const result = parseDeckList("", resolver);
+    expect(result.entries).toHaveLength(0);
+    expect(result.totalCount).toBe(0);
+  });
+});

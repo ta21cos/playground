@@ -17,6 +17,9 @@ export function deserializeDeck(
   resolver: CardResolver,
 ): DeckList {
   const json: DeckJson = JSON.parse(jsonStr);
+  if (!json.entries || !Array.isArray(json.entries)) {
+    throw new Error("不正なデッキJSONです: entries フィールドがありません");
+  }
   const entries = json.entries.map((e) => {
     const results = resolver.findByName(e.name);
     if (results.length === 0) {

@@ -5,6 +5,11 @@ export function placeStadium(
   instanceId: string,
   fromZone: "手札" = "手札",
 ): GameState {
+  const instance = state.cardInstances[instanceId];
+  if (instance && instance.card.card_category !== "スタジアム") {
+    throw new Error("スタジアムゾーンにはスタジアムカードのみ配置できます");
+  }
+
   const zones = { ...state.zones };
   zones[fromZone] = zones[fromZone].filter((id) => id !== instanceId);
 

@@ -21,13 +21,19 @@ export function parseDeckList(text: string, resolver: CardResolver): DeckList {
 
     const [, name, countStr] = match;
     const count = parseInt(countStr!, 10);
+    if (count <= 0) continue;
 
     const results = resolver.findByName(name!);
     if (results.length === 0) {
       throw new Error(`カード "${name}" が見つかりません`);
     }
 
-    entries.push({ card: results[0]!, count });
+    const existing = entries.find((e) => e.card.canonical_id === results[0]!.canonical_id);
+    if (existing) {
+      existing.count += count;
+    } else {
+      entries.push({ card: results[0]!, count });
+    }
     totalCount += count;
   }
 

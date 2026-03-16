@@ -46,3 +46,29 @@ describe("FR-37: スタジアム上書き", () => {
     expect(result.zones.トラッシュ).toHaveLength(0);
   });
 });
+
+describe("@edge-case FR-37: スタジアムのエッジケース", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("非スタジアムカードをスタジアムゾーンに配置しようとすると拒否される", () => {
+    const state = createInitialGameState();
+    const supporter = createCardInstance({
+      card_id: "supporter-1",
+      name: "博士の研究",
+      card_category: "サポート",
+      image_url: "",
+      regulation: "",
+      card_number: "",
+      rarity: "",
+      canonical_id: "supporter-1",
+      effect_text: "",
+      rule_text: "",
+    });
+    state.cardInstances[supporter.instanceId] = supporter;
+    state.zones.手札 = [supporter.instanceId];
+
+    expect(() => placeStadium(state, supporter.instanceId)).toThrow(
+      "スタジアムカードのみ",
+    );
+  });
+});

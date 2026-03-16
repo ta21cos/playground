@@ -4,6 +4,10 @@ export function moveToBench(
   state: GameState,
   instanceId: string,
 ): GameState {
+  if (state.zones.ベンチ.length >= state.benchMaxSize) {
+    throw new Error("ベンチが満杯のため移動できません");
+  }
+
   const battle = state.zones.バトル場.filter((id) => id !== instanceId);
   const bench = [...state.zones.ベンチ, instanceId];
 

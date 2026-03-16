@@ -42,3 +42,26 @@ describe("FR-36: バトル場/ベンチ入れ替え", () => {
     expect(needsBenchSelector(state)).toBe(false);
   });
 });
+
+describe("@edge-case FR-36: バトル場/ベンチ入れ替えのエッジケース", () => {
+  beforeEach(() => resetInstanceCounter());
+
+  it("ベンチが満杯のときにバトル場のポケモンをベンチに移動しようとすると拒否される", () => {
+    const state = createInitialGameState();
+    const battle = createCardInstance(createPokemonCard({ name: "ピカチュウex" }));
+    state.cardInstances[battle.instanceId] = battle;
+    state.zones.バトル場 = [battle.instanceId];
+
+    const benchIds: string[] = [];
+    for (let i = 0; i < 5; i++) {
+      const benchPoke = createCardInstance(createPokemonCard({ name: `ベンチ${i}` }));
+      state.cardInstances[benchPoke.instanceId] = benchPoke;
+      benchIds.push(benchPoke.instanceId);
+    }
+    state.zones.ベンチ = benchIds;
+    state.benchMaxSize = 5;
+
+    expect(() => moveToBench(state, battle.instanceId)).toThrow("ベンチが満杯");
+    expect(state.zones.ベンチ).toHaveLength(5);
+  });
+});

@@ -26,6 +26,7 @@ export interface CustomSetupConfig {
 export function customSetup(
   state: GameState,
   config: CustomSetupConfig,
+  benchMaxSize = 5,
 ): GameState {
   customCounter = 0;
   const allCards = state.deckCards;
@@ -36,8 +37,17 @@ export function customSetup(
     ...config.bench,
   ];
 
-  if (config.battleField && config.bench.length > 0) {
-    // check battle field limit
+  if (usedCards.length > allCards.length - 6) {
+    throw new Error("サイド6枚分のカードが不足しています");
+  }
+
+  if (config.bench.length > benchMaxSize) {
+    throw new Error(`ベンチの最大枠数(${benchMaxSize})を超えています`);
+  }
+
+  const opponentSide = config.opponentSideCount ?? 6;
+  if (opponentSide < 0 || opponentSide > 6) {
+    throw new Error("相手サイドカウンターは0〜6の範囲で設定してください");
   }
 
   const instances: Record<string, CardInstance> = {};

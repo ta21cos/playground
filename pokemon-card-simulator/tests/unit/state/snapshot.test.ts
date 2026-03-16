@@ -14,6 +14,19 @@ describe("NFR-5: スナップショット方式", () => {
     expect(snapshot.turnNumber).toBe(3);
   });
 
+  it("ベンチ拡張後の枠数がスナップショットに含まれ復元される", () => {
+    const state = createInitialGameState();
+    state.benchMaxSize = 7;
+    state.phase = "進行中";
+    state.turnNumber = 3;
+
+    const snapshot = takeSnapshot(state);
+    state.benchMaxSize = 5;
+
+    const restored = restoreSnapshot(snapshot);
+    expect(restored.benchMaxSize).toBe(7);
+  });
+
   it("スナップショットからゲーム状態を完全に復元できる", () => {
     const state = createInitialGameState();
     state.zones.手札 = ["card-1", "card-2"];

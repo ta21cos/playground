@@ -5,6 +5,10 @@ export interface TurnResult extends GameState {
 }
 
 export function startGame(state: GameState): GameState {
+  if (state.phase === "進行中") {
+    return state;
+  }
+
   if (state.zones.バトル場.length === 0) {
     throw new Error("バトル場にたねポケモンを配置してからゲームを開始してください");
   }
