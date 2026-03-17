@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import {
-  importDeck,
   startGameWithSeed,
   setupNormalGame,
   getZone,
@@ -27,6 +26,9 @@ test.describe("@edge-case デッキコード入力", () => {
     page,
   }) => {
     await page.goto("/");
+
+    const codeInput = page.locator(".deck-code-input");
+    await codeInput.clear();
 
     const loadBtn = page.getByRole("button", {
       name: "デッキコードで読み込み",
@@ -177,9 +179,7 @@ test.describe("@edge-case FR-14: N枚ドローモーダル", () => {
     await page.getByRole("button", { name: "N枚ドロー" }).click();
 
     for (const n of [1, 2, 3, 4, 5, 6, 7]) {
-      await expect(
-        page.getByRole("button", { name: `${n}枚` }),
-      ).toBeDisabled();
+      await expect(page.getByRole("button", { name: `${n}枚` })).toBeDisabled();
     }
   });
 });
