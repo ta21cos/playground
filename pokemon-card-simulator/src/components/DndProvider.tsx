@@ -1,12 +1,26 @@
 import {
   DndContext,
   type DragEndEvent,
+  type CollisionDetection,
   TouchSensor,
   MouseSensor,
   useSensor,
   useSensors,
+  pointerWithin,
   closestCenter,
 } from "@dnd-kit/core";
+
+const cardFirstCollision: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args);
+  if (pointerCollisions.length > 0) {
+    const cardHit = pointerCollisions.find((c) =>
+      String(c.id).startsWith("card:"),
+    );
+    if (cardHit) return [cardHit];
+    return pointerCollisions;
+  }
+  return closestCenter(args);
+};
 
 interface DndProviderProps {
   children: React.ReactNode;
@@ -25,7 +39,7 @@ export function DndProvider({ children, onDragEnd }: DndProviderProps) {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={cardFirstCollision}
       onDragEnd={onDragEnd}
     >
       {children}

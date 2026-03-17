@@ -5,13 +5,22 @@ import type { CardInstance } from "../types/game-state";
 
 interface DraggableCardProps {
   instance: CardInstance;
-  onClick?: () => void;
+  onClick?: (pos: { x: number; y: number }) => void;
   acceptDrop?: boolean;
 }
 
-export function DraggableCard({ instance, onClick, acceptDrop }: DraggableCardProps) {
-  const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } =
-    useDraggable({ id: instance.instanceId });
+export function DraggableCard({
+  instance,
+  onClick,
+  acceptDrop,
+}: DraggableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDragRef,
+    transform,
+    isDragging,
+  } = useDraggable({ id: instance.instanceId });
   const { isOver, setNodeRef: setDropRef } = useDroppable({
     id: `card:${instance.instanceId}`,
     disabled: !acceptDrop,
@@ -49,7 +58,7 @@ export function DraggableCard({ instance, onClick, acceptDrop }: DraggableCardPr
           const dx = Math.abs(e.clientX - pointerStart.current.x);
           const dy = Math.abs(e.clientY - pointerStart.current.y);
           if (dx < 5 && dy < 5) {
-            onClick?.();
+            onClick?.({ x: e.clientX, y: e.clientY });
           }
           pointerStart.current = null;
         }
