@@ -169,7 +169,11 @@ test.describe("@edge-case FR-14: N枚ドローモーダル", () => {
       const batch = Math.min(remaining, 7);
       await getZone(page, "山札").click();
       await page.getByRole("button", { name: "N枚ドロー" }).click();
+      await expect(
+        page.getByRole("button", { name: `${batch}枚` }),
+      ).toBeVisible();
       await page.getByRole("button", { name: `${batch}枚` }).click();
+      await page.waitForTimeout(100);
       remaining -= batch;
     }
 
@@ -179,7 +183,9 @@ test.describe("@edge-case FR-14: N枚ドローモーダル", () => {
     await page.getByRole("button", { name: "N枚ドロー" }).click();
 
     for (const n of [1, 2, 3, 4, 5, 6, 7]) {
-      await expect(page.getByRole("button", { name: `${n}枚` })).toBeDisabled();
+      await expect(
+        page.getByRole("button", { name: `${n}枚`, exact: true }),
+      ).toBeDisabled();
     }
   });
 });

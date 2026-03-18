@@ -10,10 +10,15 @@ interface DeckImportProps {
   error?: string | null;
 }
 
-export function DeckImport({ onImportText, onImportCode, loading, error }: DeckImportProps) {
+export function DeckImport({
+  onImportText,
+  onImportCode,
+  loading,
+  error,
+}: DeckImportProps) {
   const [mode, setMode] = useState<ImportMode>("code");
   const [text, setText] = useState("");
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState("DK8ca4-TVi5Cr-8cG8x4");
 
   return (
     <div className="deck-import">

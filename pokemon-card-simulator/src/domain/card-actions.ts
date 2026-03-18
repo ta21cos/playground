@@ -1,10 +1,7 @@
 import type { GameState } from "../types/game-state";
 import { shuffle } from "./game-setup";
 
-export function searchDeck(
-  state: GameState,
-  selectedIds: string[],
-): GameState {
+export function searchDeck(state: GameState, selectedIds: string[]): GameState {
   const remaining = state.zones.山札.filter((id) => !selectedIds.includes(id));
   const hand = [...state.zones.手札, ...selectedIds];
 
@@ -80,10 +77,7 @@ export function viewSide(state: GameState): string[] {
   return [...state.zones.サイド];
 }
 
-export function takeSideCard(
-  state: GameState,
-  instanceId: string,
-): GameState {
+export function takeSideCard(state: GameState, instanceId: string): GameState {
   const side = state.zones.サイド.filter((id) => id !== instanceId);
   const hand = [...state.zones.手札, instanceId];
 
@@ -105,5 +99,23 @@ export function shuffleDeck(state: GameState): GameState {
   return {
     ...state,
     zones: { ...state.zones, 山札: shuffle(state.zones.山札) },
+  };
+}
+
+export function returnHandToDeck(
+  state: GameState,
+  position: "top" | "bottom",
+): GameState {
+  const hand = [...state.zones.手札];
+  if (hand.length === 0) return state;
+
+  const deck =
+    position === "top"
+      ? [...hand, ...state.zones.山札]
+      : [...state.zones.山札, ...hand];
+
+  return {
+    ...state,
+    zones: { ...state.zones, 手札: [], 山札: deck },
   };
 }

@@ -5,7 +5,7 @@ interface DroppableZoneProps {
   zoneName: ZoneName;
   children: React.ReactNode;
   cardCount: number;
-  onZoneClick?: () => void;
+  onZoneClick?: (e: React.MouseEvent) => void;
 }
 
 export function DroppableZone({

@@ -32,6 +32,7 @@ import {
   takeSideCard,
   takeSideRandom,
   shuffleDeck,
+  returnHandToDeck,
 } from "./domain/card-actions";
 import { attachEnergy, attachTool } from "./domain/attachment";
 import { moveCardWithCleanup } from "./domain/attachment-cleanup";
@@ -99,6 +100,7 @@ type Action =
   | { type: "TAKE_SIDE"; instanceId: string }
   | { type: "TAKE_SIDE_RANDOM" }
   | { type: "SHUFFLE_DECK" }
+  | { type: "RETURN_HAND_TO_DECK"; position: "top" | "bottom" }
   | { type: "ATTACH_ENERGY"; energyId: string; pokemonId: string }
   | { type: "ATTACH_TOOL"; toolId: string; pokemonId: string }
   | { type: "EVOLVE"; evolutionId: string; targetId: string }
@@ -250,7 +252,7 @@ function appReducer(state: AppState, action: Action): AppState {
       };
 
     case "SET_MODAL":
-      return { ...state, modal: action.modal };
+      return { ...state, modal: action.modal, contextMenu: null };
 
     case "SET_CONTEXT_MENU":
       return { ...state, contextMenu: action.menu };
@@ -316,6 +318,12 @@ function appReducer(state: AppState, action: Action): AppState {
 
     case "SHUFFLE_DECK":
       return withHistory(state, shuffleDeck(state.game));
+
+    case "RETURN_HAND_TO_DECK":
+      return {
+        ...withHistory(state, returnHandToDeck(state.game, action.position)),
+        contextMenu: null,
+      };
 
     case "ATTACH_ENERGY":
       try {
@@ -603,9 +611,26 @@ function App() {
 
   function contextMenuItems() {
     if (!contextMenu) return [];
+    const items: Array<{ label: string; action: () => void }> = [];
+
+    if (contextMenu.instanceId === "__deck__") {
+      items.push({
+        label: "サーチ",
+        action: () => dispatch({ type: "SET_MODAL", modal: "search" }),
+      });
+      items.push({
+        label: "N枚ドロー",
+        action: () => dispatch({ type: "SET_MODAL", modal: "drawInput" }),
+      });
+      items.push({
+        label: "シャッフル",
+        action: () => dispatch({ type: "SHUFFLE_DECK" }),
+      });
+      return items;
+    }
+
     const inst = game.cardInstances[contextMenu.instanceId];
     if (!inst) return [];
-    const items: Array<{ label: string; action: () => void }> = [];
 
     if (contextMenu.zone === "手札") {
       items.push({
@@ -621,6 +646,49 @@ function App() {
             instanceId: contextMenu.instanceId,
           }),
       });
+      items.push({
+        label: "手札をすべて山札の上に戻す",
+        action: () =>
+          dispatch({ type: "RETURN_HAND_TO_DECK", position: "top" }),
+      });
+      items.push({
+        label: "手札をすべて山札の下に戻す",
+        action: () =>
+          dispatch({ type: "RETURN_HAND_TO_DECK", position: "bottom" }),
+      });
+
+      const isEnergy =
+        inst.card.card_category === "基本エネルギー" ||
+        inst.card.card_category === "特殊エネルギー";
+      const isTool = inst.card.card_category === "ポケモンのどうぐ";
+      if (isEnergy || isTool) {
+        const fieldPokemon = [...game.zones.バトル場, ...game.zones.ベンチ]
+          .map((id) => ({ id, inst: game.cardInstances[id] }))
+          .filter((p) => p.inst?.card.card_category === "ポケモン");
+        for (const pokemon of fieldPokemon) {
+          if (isEnergy) {
+            items.push({
+              label: `${pokemon.inst!.card.name} にエネルギー付与`,
+              action: () =>
+                dispatch({
+                  type: "ATTACH_ENERGY",
+                  energyId: contextMenu.instanceId,
+                  pokemonId: pokemon.id,
+                }),
+            });
+          } else if (!pokemon.inst!.attachedTool) {
+            items.push({
+              label: `${pokemon.inst!.card.name} にどうぐ付与`,
+              action: () =>
+                dispatch({
+                  type: "ATTACH_TOOL",
+                  toolId: contextMenu.instanceId,
+                  pokemonId: pokemon.id,
+                }),
+            });
+          }
+        }
+      }
     }
 
     if (
@@ -768,8 +836,15 @@ function App() {
               }
             >
               <div className="side-stack">
-                {Array.from({ length: game.zones.サイド.length }, (_, i) => (
-                  <div key={i} className="side-card-placeholder" />
+                {Array.from({ length: 6 }, (_, i) => (
+                  <div
+                    key={i}
+                    className={
+                      i < game.zones.サイド.length
+                        ? "side-placeholder side-placeholder-filled"
+                        : "side-placeholder"
+                    }
+                  />
                 ))}
               </div>
             </DroppableZone>
@@ -778,16 +853,22 @@ function App() {
           <div className="area-field">
             <div className="field-top">
               <DroppableZone
-                zoneName="スタジアム"
-                cardCount={game.zones.スタジアム.length}
-              >
-                {renderCards("スタジアム")}
-              </DroppableZone>
-              <DroppableZone
                 zoneName="バトル場"
                 cardCount={game.zones.バトル場.length}
               >
+                {game.zones.バトル場.length === 0 && (
+                  <div className="card-placeholder" />
+                )}
                 {renderCards("バトル場")}
+              </DroppableZone>
+              <DroppableZone
+                zoneName="スタジアム"
+                cardCount={game.zones.スタジアム.length}
+              >
+                {game.zones.スタジアム.length === 0 && (
+                  <div className="card-placeholder" />
+                )}
+                {renderCards("スタジアム")}
               </DroppableZone>
             </div>
             <div className="field-bench">
@@ -796,6 +877,17 @@ function App() {
                 cardCount={game.zones.ベンチ.length}
               >
                 {renderCards("ベンチ")}
+                {Array.from(
+                  {
+                    length: Math.max(
+                      0,
+                      game.benchMaxSize - game.zones.ベンチ.length,
+                    ),
+                  },
+                  (_, i) => (
+                    <div key={`bench-ph-${i}`} className="card-placeholder" />
+                  ),
+                )}
               </DroppableZone>
               <div className="bench-controls">
                 <button
@@ -829,14 +921,31 @@ function App() {
             <DroppableZone
               zoneName="山札"
               cardCount={game.zones.山札.length}
-              onZoneClick={() =>
-                dispatch({ type: "SET_MODAL", modal: "deckMenu" })
-              }
+              onZoneClick={(e) => {
+                dispatch({
+                  type: "SET_CONTEXT_MENU",
+                  menu: {
+                    x: e.clientX,
+                    y: e.clientY,
+                    instanceId: "__deck__",
+                    zone: "山札",
+                  },
+                });
+              }}
             >
               <div className="deck-stack">
                 <span className="deck-count">{game.zones.山札.length}</span>
               </div>
             </DroppableZone>
+            {game.phase === "進行中" && (
+              <button
+                className="draw-1-btn"
+                onClick={() => dispatch({ type: "DRAW_N", n: 1 })}
+                disabled={game.zones.山札.length === 0}
+              >
+                1枚ドロー
+              </button>
+            )}
             <DroppableZone
               zoneName="トラッシュ"
               cardCount={game.zones.トラッシュ.length}
