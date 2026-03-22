@@ -94,21 +94,20 @@ export async function dragCardToZone(
   const endY = zoneBox.y + zoneBox.height / 2;
 
   await page.mouse.move(startX, startY);
-  await page.waitForTimeout(50);
   await page.mouse.down();
+
+  // activationConstraint.distance(8px) を確実に超える初期移動
+  await page.mouse.move(startX + 10, startY, { steps: 3 });
   await page.waitForTimeout(50);
 
-  const steps = 25;
-  for (let i = 1; i <= steps; i++) {
-    const x = startX + ((endX - startX) * i) / steps;
-    const y = startY + ((endY - startY) * i) / steps;
-    await page.mouse.move(x, y);
-    await page.waitForTimeout(10);
-  }
-
+  // ターゲットへ移動
+  await page.mouse.move(endX, endY, { steps: 10 });
   await page.waitForTimeout(50);
+
+  // ドロップ
+  await page.mouse.move(endX, endY);
   await page.mouse.up();
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(200);
 }
 
 export function getZone(page: Page, zoneName: string) {
@@ -127,7 +126,11 @@ export function getCardInZone(page: Page, zoneName: string, cardName?: string) {
   return zone.locator("[data-card-id]").first();
 }
 
-export async function clickCard(page: Page, zoneName: string, cardName?: string) {
+export async function clickCard(
+  page: Page,
+  zoneName: string,
+  cardName?: string,
+) {
   const card = getCardInZone(page, zoneName, cardName);
   await card.click({ force: true });
   await page.waitForTimeout(200);
