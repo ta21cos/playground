@@ -1,0 +1,45 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "pr-ci-monitor",
+  "title": "PR CI Monitor",
+  "description": "Monitor CI status of your pull requests across repositories",
+  "icon": "command-icon.png",
+  "author": "ta21cos",
+  "categories": ["Developer Tools"],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "list-prs",
+      "title": "List My PRs",
+      "description": "Show CI status of your open pull requests",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "githubUser",
+      "title": "GitHub Username",
+      "description": "Your GitHub username (defaults to authenticated gh user)",
+      "type": "textfield",
+      "required": false,
+      "placeholder": "ta21cos"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.98.0",
+    "@raycast/utils": "^1.19.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "22.13.14",
+    "@types/react": "19.0.12",
+    "eslint": "^9.23.0",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint"
+  }
+}
