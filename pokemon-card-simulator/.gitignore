@@ -7,3 +7,4 @@ tsconfig.tsbuildinfo
 test-results/
 .playwright-mcp/
 *.png
+!tests/visual/__screenshots__/**/*.png
