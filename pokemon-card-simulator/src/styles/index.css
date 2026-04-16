@@ -198,6 +198,25 @@ body {
   z-index: 10;
 }
 
+/* Attached cards (energy / tool) stacked to the right */
+.card-stack {
+  display: inline-flex !important;
+  align-items: flex-start;
+}
+
+.card-stack > .card {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.attached-card {
+  margin-left: -44px;
+  position: relative;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
 .zone-手札 .card:hover {
   transform: scale(1.15) translateY(-8px);
 }
@@ -739,6 +758,10 @@ body {
 
   .zone-手札 .zone-cards > * + * {
     margin-left: -16px;
+  }
+
+  .attached-card {
+    margin-left: -80px;
   }
 
   .damage-counter {

@@ -7,12 +7,14 @@ interface DraggableCardProps {
   instance: CardInstance;
   onClick?: (pos: { x: number; y: number }) => void;
   acceptDrop?: boolean;
+  attachedInstances?: CardInstance[];
 }
 
 export function DraggableCard({
   instance,
   onClick,
   acceptDrop,
+  attachedInstances,
 }: DraggableCardProps) {
   const {
     attributes,
@@ -37,12 +39,15 @@ export function DraggableCard({
         outline: isOver ? "2px solid #3498db" : undefined,
       };
 
+  const hasAttachments = attachedInstances && attachedInstances.length > 0;
+
   return (
     <div
       ref={(node) => {
         setDragRef(node);
         setDropRef(node);
       }}
+      className={hasAttachments ? "card-stack" : undefined}
       style={style}
       {...listeners}
       {...attributes}
@@ -64,12 +69,16 @@ export function DraggableCard({
         }
       }}
     >
-      <Card
-        card={instance.card}
-        damageCounters={instance.damageCounters}
-        attachedEnergies={instance.attachedEnergies.length}
-        attachedTool={instance.attachedTool}
-      />
+      <Card card={instance.card} damageCounters={instance.damageCounters} />
+      {attachedInstances?.map((attached, idx) => (
+        <div
+          key={attached.instanceId}
+          className="attached-card"
+          style={{ zIndex: attachedInstances.length - idx }}
+        >
+          <Card card={attached.card} />
+        </div>
+      ))}
     </div>
   );
 }

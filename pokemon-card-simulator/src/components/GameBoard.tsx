@@ -12,13 +12,7 @@ export function GameBoard({ state }: GameBoardProps) {
       const inst = state.cardInstances[id];
       if (!inst) return null;
       return (
-        <Card
-          key={id}
-          card={inst.card}
-          damageCounters={inst.damageCounters}
-          attachedEnergies={inst.attachedEnergies.length}
-          attachedTool={inst.attachedTool ? state.cardInstances[inst.attachedTool]?.card.name : null}
-        />
+        <Card key={id} card={inst.card} damageCounters={inst.damageCounters} />
       );
     });
   }
