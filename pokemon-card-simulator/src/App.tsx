@@ -642,11 +642,30 @@ function App() {
               cardCount={game.zones.トラッシュ.length}
               onZoneClick={() => openModal("trashView")}
             >
-              <div className="trash-stack">
-                <span className="trash-count">
-                  {game.zones.トラッシュ.length}
-                </span>
-              </div>
+              {(() => {
+                const trash = game.zones.トラッシュ;
+                if (trash.length === 0) {
+                  return (
+                    <div className="trash-stack">
+                      <span className="trash-count">0</span>
+                    </div>
+                  );
+                }
+                const topId = trash[trash.length - 1]!;
+                const topInst = game.cardInstances[topId];
+                if (!topInst) {
+                  return (
+                    <div className="trash-stack">
+                      <span className="trash-count">{trash.length}</span>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="trash-top">
+                    <Card card={topInst.card} />
+                  </div>
+                );
+              })()}
             </DroppableZone>
           </div>
 

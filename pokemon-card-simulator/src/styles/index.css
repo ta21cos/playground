@@ -416,6 +416,16 @@ body {
   background: rgba(60, 140, 60, 0.04);
   border-color: rgba(60, 140, 60, 0.12);
   box-shadow: 0 0 16px rgba(60, 140, 60, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* SVG: deck stack y=98-188、zone y=55-230 — header の直下に配置 */
+.zone-山札 .zone-cards {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
 }
 
 .zone-山札 .zone-label-en {
@@ -430,6 +440,28 @@ body {
   background: rgba(140, 60, 60, 0.04);
   border-color: rgba(140, 60, 60, 0.12);
   box-shadow: 0 0 16px rgba(140, 60, 60, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.zone-トラッシュ .zone-cards {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+/* トラッシュ最新カード (表向き) — Card と同サイズ */
+.trash-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trash-top .card {
+  /* Card は cqw で 6.8 x 9.5、deck-stack と揃える */
+  width: 6.4cqw;
+  height: 9cqw;
 }
 
 .zone-トラッシュ .zone-label-en {
