@@ -55,10 +55,29 @@ function cardStack(
   return `<div class="card-stack">${mainCard}${attachedHtml}</div>`;
 }
 
-function zone(name: string, count: number, cards: string): string {
-  return `<div class="zone zone-${name}" data-zone="${name}" style="display:inline-flex;flex-direction:column">
+const ZONE_LABELS: Record<string, string> = {
+  バトル場: "ACTIVE",
+  ベンチ: "BENCH",
+  手札: "HAND",
+  山札: "DECK",
+  トラッシュ: "DISCARD",
+  サイド: "PRIZE",
+  スタジアム: "STADIUM",
+};
+
+function zone(
+  name: string,
+  count: number,
+  cards: string,
+  style: string = "",
+): string {
+  const label = ZONE_LABELS[name] ?? "";
+  return `<div class="zone zone-${name}" data-zone="${name}" style="display:inline-flex;flex-direction:column;${style}">
   <div class="zone-header">
-    <span class="zone-name">${name}</span>
+    <div class="zone-labels">
+      <span class="zone-label-en">${label}</span>
+      <span class="zone-name">${name}</span>
+    </div>
     <span class="zone-count">${count}</span>
   </div>
   <div class="zone-cards">${cards}</div>

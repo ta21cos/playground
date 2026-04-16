@@ -506,9 +506,17 @@ function App() {
         />
 
         <div className="game-board">
+          <div className="board-corner board-corner-tl" />
+          <div className="board-corner board-corner-tr" />
+          <div className="board-corner board-corner-bl" />
+          <div className="board-corner board-corner-br" />
+
+          <div className="opponent-indicator">OPPONENT SIDE</div>
+
           <div className="area-side">
             <DroppableZone
               zoneName="サイド"
+              label="Prize"
               cardCount={game.zones.サイド.length}
               onZoneClick={() => openModal("sideView")}
             >
@@ -531,6 +539,7 @@ function App() {
             <div className="field-top">
               <DroppableZone
                 zoneName="バトル場"
+                label="Active"
                 cardCount={game.zones.バトル場.length}
               >
                 {game.zones.バトル場.length === 0 && (
@@ -540,6 +549,7 @@ function App() {
               </DroppableZone>
               <DroppableZone
                 zoneName="スタジアム"
+                label="Stadium"
                 cardCount={game.zones.スタジアム.length}
               >
                 {game.zones.スタジアム.length === 0 && (
@@ -551,7 +561,22 @@ function App() {
             <div className="field-bench">
               <DroppableZone
                 zoneName="ベンチ"
+                label="Bench"
                 cardCount={game.zones.ベンチ.length}
+                style={
+                  {
+                    "--bench-cols": game.benchMaxSize,
+                    "--bench-gap": game.benchMaxSize <= 5 ? "2.5cqw" : "0.8cqw",
+                    "--bench-width":
+                      game.benchMaxSize <= 5
+                        ? "47cqw"
+                        : game.benchMaxSize === 6
+                          ? "52cqw"
+                          : game.benchMaxSize === 7
+                            ? "57cqw"
+                            : "63cqw",
+                  } as React.CSSProperties
+                }
               >
                 {renderCards("ベンチ")}
                 {Array.from(
@@ -587,6 +612,7 @@ function App() {
           <div className="area-deck-trash">
             <DroppableZone
               zoneName="山札"
+              label="Deck"
               cardCount={game.zones.山札.length}
               onZoneClick={(e) => {
                 setContextMenu({
@@ -612,6 +638,7 @@ function App() {
             )}
             <DroppableZone
               zoneName="トラッシュ"
+              label="Discard"
               cardCount={game.zones.トラッシュ.length}
               onZoneClick={() => openModal("trashView")}
             >
@@ -624,11 +651,17 @@ function App() {
           </div>
 
           <div className="area-hand">
-            <DroppableZone zoneName="手札" cardCount={game.zones.手札.length}>
+            <DroppableZone
+              zoneName="手札"
+              label="Hand"
+              cardCount={game.zones.手札.length}
+            >
               {renderCards("手札")}
             </DroppableZone>
           </div>
         </div>
+
+        <div className="board-footer">POKEMON TCG SIMULATOR</div>
 
         <ActionBar
           phase={game.phase}
