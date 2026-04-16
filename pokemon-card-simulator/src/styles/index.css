@@ -564,10 +564,32 @@ body {
 }
 
 .attached-card {
-  margin-left: -44px;
+  /* card width 6.8cqw → 2.4cqw 表示 (右にずらして重ねる) */
+  margin-left: -4.4cqw;
   position: relative;
   flex-shrink: 0;
   opacity: 0.85;
+}
+
+/* ベンチでは付与カードを下方向に重ねる (実カードゲーム準拠) */
+.zone-ベンチ .card-stack {
+  flex-direction: column;
+  align-items: center;
+}
+
+.zone-ベンチ .attached-card {
+  margin-left: 0;
+  /* card height 9.5cqw → 2cqw 表示 (上部のエネルギーシンボル) */
+  margin-top: -7.5cqw;
+}
+
+/* ベンチゾーンは付与カードのオーバーフローを許可 */
+.zone-ベンチ {
+  overflow: visible;
+}
+
+.zone-ベンチ .zone-cards {
+  overflow: visible;
 }
 
 .zone-手札 .card:hover {
