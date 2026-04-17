@@ -236,6 +236,7 @@ function App() {
           attachedInstances={
             attachedInstances.length > 0 ? attachedInstances : undefined
           }
+          stackDirection={zone === "ベンチ" ? "up" : "right"}
           onClick={(pos) =>
             setContextMenu({ x: pos.x, y: pos.y, instanceId: id, zone })
           }

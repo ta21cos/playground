@@ -571,16 +571,23 @@ body {
   opacity: 0.85;
 }
 
-/* ベンチでは付与カードを下方向に重ねる (実カードゲーム準拠) */
-.zone-ベンチ .card-stack {
-  flex-direction: column;
-  align-items: center;
+/* 上方向スタック (ベンチ用):
+   DOM 順: [Att1, Att2, Main] — DraggableCard が up の時に反転描画
+   column 方向で attached-card の margin-bottom 負でメインカードと重ねる
+   メインカード (最後の .card) は z-index で前面 */
+.card-stack-up {
+  flex-direction: column !important;
+  align-items: center !important;
 }
 
-.zone-ベンチ .attached-card {
+.card-stack-up .attached-card {
   margin-left: 0;
-  /* card height 9.5cqw → 2cqw 表示 (上部のエネルギーシンボル) */
-  margin-top: -7.5cqw;
+  margin-bottom: -7.5cqw;
+}
+
+.card-stack-up > .card:last-child {
+  position: relative;
+  z-index: 10;
 }
 
 /* ベンチゾーンは付与カードのオーバーフローを許可 */

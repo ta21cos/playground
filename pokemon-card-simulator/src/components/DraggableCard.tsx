@@ -8,6 +8,7 @@ interface DraggableCardProps {
   onClick?: (pos: { x: number; y: number }) => void;
   acceptDrop?: boolean;
   attachedInstances?: CardInstance[];
+  stackDirection?: "right" | "up";
 }
 
 export function DraggableCard({
@@ -15,6 +16,7 @@ export function DraggableCard({
   onClick,
   acceptDrop,
   attachedInstances,
+  stackDirection = "right",
 }: DraggableCardProps) {
   const {
     attributes,
@@ -40,6 +42,24 @@ export function DraggableCard({
       };
 
   const hasAttachments = attachedInstances && attachedInstances.length > 0;
+  const stackClass = hasAttachments
+    ? stackDirection === "up"
+      ? "card-stack card-stack-up"
+      : "card-stack"
+    : undefined;
+
+  const mainCard = (
+    <Card card={instance.card} damageCounters={instance.damageCounters} />
+  );
+  const attachedCards = attachedInstances?.map((attached, idx) => (
+    <div
+      key={attached.instanceId}
+      className="attached-card"
+      style={{ zIndex: attachedInstances.length - idx }}
+    >
+      <Card card={attached.card} />
+    </div>
+  ));
 
   return (
     <div
@@ -47,7 +67,7 @@ export function DraggableCard({
         setDragRef(node);
         setDropRef(node);
       }}
-      className={hasAttachments ? "card-stack" : undefined}
+      className={stackClass}
       style={style}
       {...listeners}
       {...attributes}
@@ -69,16 +89,17 @@ export function DraggableCard({
         }
       }}
     >
-      <Card card={instance.card} damageCounters={instance.damageCounters} />
-      {attachedInstances?.map((attached, idx) => (
-        <div
-          key={attached.instanceId}
-          className="attached-card"
-          style={{ zIndex: attachedInstances.length - idx }}
-        >
-          <Card card={attached.card} />
-        </div>
-      ))}
+      {stackDirection === "up" ? (
+        <>
+          {attachedCards}
+          {mainCard}
+        </>
+      ) : (
+        <>
+          {mainCard}
+          {attachedCards}
+        </>
+      )}
     </div>
   );
 }

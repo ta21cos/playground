@@ -45,6 +45,7 @@ function damage(n: number): string {
 function cardStack(
   mainCard: string,
   attached: { name: string; category: string }[],
+  direction: "right" | "up" = "right",
 ): string {
   const attachedHtml = attached
     .map(
@@ -52,6 +53,9 @@ function cardStack(
         `<div class="attached-card" style="z-index:${attached.length - i}">${cardFallback(a.name, a.category)}</div>`,
     )
     .join("");
+  if (direction === "up") {
+    return `<div class="card-stack card-stack-up">${attachedHtml}${mainCard}</div>`;
+  }
   return `<div class="card-stack">${mainCard}${attachedHtml}</div>`;
 }
 
@@ -220,10 +224,14 @@ test.describe("Zone: ベンチ", () => {
   });
 
   test("エネルギー付きポケモンがベンチにいる", async ({ page }) => {
-    const koduck = cardStack(cardImg("コダック"), [
-      { name: "基本炎エネルギー", category: "基本エネルギー" },
-      { name: "基本炎エネルギー", category: "基本エネルギー" },
-    ]);
+    const koduck = cardStack(
+      cardImg("コダック"),
+      [
+        { name: "基本炎エネルギー", category: "基本エネルギー" },
+        { name: "基本炎エネルギー", category: "基本エネルギー" },
+      ],
+      "up",
+    );
     const cards = koduck + cardImg("ゼニガメ") + placeholder().repeat(3);
     await page.setContent(html(zone("ベンチ", 2, cards)));
     await expect(page.locator("[data-zone]")).toHaveScreenshot();
