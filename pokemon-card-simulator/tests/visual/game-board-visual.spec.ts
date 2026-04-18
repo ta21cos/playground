@@ -256,6 +256,48 @@ test.describe("Zone: 手札", () => {
     await page.setContent(html(zone("手札", 0, "")));
     await expect(page.locator("[data-zone]")).toHaveScreenshot();
   });
+
+  test("ホバー時にカードが拡大される（左端）", async ({ page }) => {
+    const cards =
+      cardImg("ピカチュウ") +
+      cardFallback("基本炎エネルギー", "基本エネルギー") +
+      cardFallback("ネストボール", "グッズ") +
+      cardImg("コダック") +
+      cardFallback("学習装置", "ポケモンのどうぐ");
+    await page.setContent(html(zone("手札", 5, cards, "margin:20px")));
+    const firstCard = page.locator(".card").first();
+    await firstCard.hover();
+    await page.waitForTimeout(200);
+    await expect(page.locator("[data-zone]")).toHaveScreenshot();
+  });
+
+  test("ホバー時にカードが拡大される（中央）", async ({ page }) => {
+    const cards =
+      cardImg("ピカチュウ") +
+      cardFallback("基本炎エネルギー", "基本エネルギー") +
+      cardFallback("ネストボール", "グッズ") +
+      cardImg("コダック") +
+      cardFallback("学習装置", "ポケモンのどうぐ");
+    await page.setContent(html(zone("手札", 5, cards, "margin:20px")));
+    const middleCard = page.locator(".card").nth(2);
+    await middleCard.hover();
+    await page.waitForTimeout(200);
+    await expect(page.locator("[data-zone]")).toHaveScreenshot();
+  });
+
+  test("ホバー時にカードが拡大される（右端）", async ({ page }) => {
+    const cards =
+      cardImg("ピカチュウ") +
+      cardFallback("基本炎エネルギー", "基本エネルギー") +
+      cardFallback("ネストボール", "グッズ") +
+      cardImg("コダック") +
+      cardFallback("学習装置", "ポケモンのどうぐ");
+    await page.setContent(html(zone("手札", 5, cards, "margin:20px")));
+    const lastCard = page.locator(".card").last();
+    await lastCard.hover();
+    await page.waitForTimeout(200);
+    await expect(page.locator("[data-zone]")).toHaveScreenshot();
+  });
 });
 
 // ─── Zone: スタジアム ───
