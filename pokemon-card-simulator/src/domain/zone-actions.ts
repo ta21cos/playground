@@ -7,6 +7,14 @@ export function moveCard(
   from: ZoneName,
   to: ZoneName,
 ): GameState {
+  if (
+    to === "バトル場" &&
+    state.zones.バトル場.length > 0 &&
+    !state.zones.バトル場.includes(instanceId)
+  ) {
+    return state;
+  }
+
   const fromZone = state.zones[from].filter((id) => id !== instanceId);
   const toZone = [...state.zones[to], instanceId];
 
@@ -20,10 +28,7 @@ export function moveCard(
   };
 }
 
-export function setBenchMaxSize(
-  state: GameState,
-  newSize: number,
-): GameState {
+export function setBenchMaxSize(state: GameState, newSize: number): GameState {
   if (newSize < 5 || newSize > 8) {
     return state;
   }

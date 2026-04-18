@@ -10,6 +10,14 @@ export function moveCardWithCleanup(
   const instance = state.cardInstances[instanceId];
   if (!instance) return state;
 
+  if (
+    to === "バトル場" &&
+    state.zones.バトル場.length > 0 &&
+    !state.zones.バトル場.includes(instanceId)
+  ) {
+    return state;
+  }
+
   const trashIds: string[] = [
     ...instance.attachedEnergies,
     ...(instance.attachedTool ? [instance.attachedTool] : []),
@@ -60,10 +68,16 @@ export function detachEnergy(
           zones,
           cardInstances: {
             ...state.cardInstances,
-            [pokemonInstanceId]: { ...pokemon, attachedEnergies: updatedEnergies },
+            [pokemonInstanceId]: {
+              ...pokemon,
+              attachedEnergies: updatedEnergies,
+            },
             [targetPokemonId]: {
               ...targetPokemon,
-              attachedEnergies: [...targetPokemon.attachedEnergies, energyInstanceId],
+              attachedEnergies: [
+                ...targetPokemon.attachedEnergies,
+                energyInstanceId,
+              ],
             },
           },
         };
@@ -121,7 +135,9 @@ export function detachEnergyToTarget(
       ...state.cardInstances,
       [fromPokemonId]: {
         ...fromPokemon,
-        attachedEnergies: fromPokemon.attachedEnergies.filter((id) => id !== energyInstanceId),
+        attachedEnergies: fromPokemon.attachedEnergies.filter(
+          (id) => id !== energyInstanceId,
+        ),
       },
       [toPokemonId]: {
         ...toPokemon,
